@@ -9,6 +9,7 @@ class UserBase(BaseModel):
     phone: Optional[str] = None
     age: Optional[int] = None
     language_preference: str = "en"
+    role: str = "patient"  # patient, provider, government
 
 
 class UserCreate(UserBase):
@@ -25,6 +26,7 @@ class UserResponse(UserBase):
     id: str
     is_active: bool
     created_at: datetime
+    role: str  # Include role in response
     
     class Config:
         from_attributes = True

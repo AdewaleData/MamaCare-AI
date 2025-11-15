@@ -1,36 +1,37 @@
-# MamaCare AI Frontend
+# MamaCare AI - Frontend
 
-A production-ready React application for maternal health risk assessment in Nigeria.
+A modern, user-friendly web application for pregnancy health management built with React, TypeScript, and Tailwind CSS.
 
 ## Features
 
-- **Mobile-first Design**: Optimized for mobile devices with responsive layout
-- **Authentication**: Secure login/register with JWT tokens
-- **Health Records**: Track and manage health data
-- **Risk Assessment**: AI-powered maternal health risk evaluation
-- **Appointments**: Schedule and manage medical appointments
-- **Emergency Contacts**: Quick access to emergency information
-- **Multi-language Support**: English, Hausa, Yoruba, and Igbo
-- **PWA Support**: Progressive Web App capabilities
-- **Offline Support**: Works offline with cached data
+- 🎨 **Modern UI/UX** - Clean, intuitive interface following HCI principles
+- 📱 **Responsive Design** - Works seamlessly on desktop, tablet, and mobile
+- 🔐 **Authentication** - Secure login and registration
+- 📊 **Health Tracking** - Record and track vital signs and health measurements
+- 🤰 **Pregnancy Management** - Track pregnancy details, weeks, and trimester
+- ⚠️ **Emergency System** - One-tap emergency alerts with contact notifications
+- 🧠 **AI Risk Assessment** - ML-powered risk analysis and recommendations
+- 🌍 **Multilingual Support** - Support for multiple Nigerian languages
+- ♿ **Accessible** - Built with accessibility in mind
 
 ## Tech Stack
 
-- **React 18** with TypeScript
-- **Tailwind CSS** for styling
-- **React Router** for navigation
-- **Zustand** for state management
-- **React Query** for data fetching
-- **React Hook Form** with Yup validation
-- **Heroicons** for icons
-- **Framer Motion** for animations
+- **React 18** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **Tailwind CSS** - Styling
+- **React Router** - Routing
+- **TanStack Query** - Data fetching and caching
+- **Zustand** - State management
+- **Axios** - HTTP client
+- **Lucide React** - Icons
+- **date-fns** - Date formatting
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 16+ 
-- npm or yarn
+- Node.js 18+ and npm
 
 ### Installation
 
@@ -39,113 +40,62 @@ A production-ready React application for maternal health risk assessment in Nige
 npm install
 ```
 
-2. Create environment file:
+2. Start the development server:
 ```bash
-cp .env.example .env
+npm run dev
 ```
 
-3. Update the API URL in `.env` if needed:
-```
-REACT_APP_API_URL=http://localhost:8000/api/v1
-```
+3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-4. Start the development server:
-```bash
-npm start
-```
-
-The app will open at [http://localhost:3000](http://localhost:3000).
-
-### Building for Production
+### Build for Production
 
 ```bash
 npm run build
 ```
 
-This creates an optimized production build in the `build` folder.
+The built files will be in the `dist` directory.
 
 ## Project Structure
 
 ```
 src/
-├── components/          # Reusable UI components
-│   ├── auth/           # Authentication components
-│   ├── layout/         # Layout components (Navbar, Sidebar)
-│   └── ui/             # Basic UI components
-├── pages/              # Page components
-│   ├── auth/           # Login/Register pages
-│   ├── dashboard/      # Dashboard page
-│   ├── health/         # Health records pages
-│   ├── risk/           # Risk assessment pages
-│   ├── appointments/   # Appointment pages
-│   ├── emergency/      # Emergency pages
-│   ├── pregnancy/      # Pregnancy pages
-│   ├── profile/        # Profile pages
-│   └── education/      # Education pages
-├── services/           # API services
-│   └── api/            # API client and endpoints
-├── store/              # State management
-├── types/              # TypeScript type definitions
-└── utils/              # Utility functions
+├── components/       # Reusable UI components
+├── pages/           # Page components
+│   ├── auth/       # Authentication pages
+│   ├── health/     # Health record pages
+│   └── pregnancy/  # Pregnancy management pages
+├── services/        # API services
+├── store/           # State management
+├── types/           # TypeScript type definitions
+├── App.tsx         # Main app component
+├── main.tsx        # Entry point
+└── index.css       # Global styles
 ```
 
-## Key Features
+## HCI Principles Applied
 
-### Authentication
-- Secure JWT-based authentication
-- Protected routes
-- Automatic token refresh
-- Persistent login state
-
-### Responsive Design
-- Mobile-first approach
-- Desktop and tablet optimized
-- Touch-friendly interface
-- Bottom navigation for mobile
-
-### State Management
-- Zustand for global state
-- React Query for server state
-- Local storage persistence
-- Optimistic updates
-
-### Form Handling
-- React Hook Form for form management
-- Yup for validation
-- Error handling and display
-- Accessibility support
+1. **Visibility** - Clear navigation, status indicators, and feedback
+2. **Feedback** - Loading states, success/error messages, visual confirmations
+3. **Constraints** - Form validation, disabled states, required fields
+4. **Consistency** - Uniform design patterns, color scheme, and interactions
+5. **Error Prevention** - Input validation, confirmations for critical actions
+6. **Recognition over Recall** - Visual cues, icons, and clear labels
+7. **Flexibility** - Responsive design, keyboard navigation support
+8. **Accessibility** - ARIA labels, semantic HTML, keyboard navigation
 
 ## API Integration
 
-The app connects to the MamaCare AI backend API. Make sure the backend is running on the configured URL.
+The frontend connects to the backend API at `http://127.0.0.1:8001/api/v1`. Make sure the backend server is running.
 
-### Available Endpoints
-- Authentication: `/auth/login`, `/auth/register`
-- Health Records: `/health-records`
-- Risk Assessment: `/risk-assessments`
-- Appointments: `/appointments`
-- Emergency Contacts: `/emergency-contacts`
+## Environment Variables
 
-## Deployment
+Create a `.env` file if needed:
 
-### Environment Variables
-- `REACT_APP_API_URL`: Backend API URL
-- `NODE_ENV`: Environment (development/production)
-
-### Build Optimization
-- Code splitting
-- Tree shaking
-- Minification
-- Asset optimization
-
-## Contributing
-
-1. Follow the existing code style
-2. Use TypeScript for type safety
-3. Write meaningful commit messages
-4. Test on mobile devices
-5. Ensure accessibility compliance
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8001/api/v1
+```
 
 ## License
 
-This project is part of the MamaCare AI maternal health platform.
+MIT
+

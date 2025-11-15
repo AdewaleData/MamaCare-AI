@@ -15,6 +15,7 @@ class User(Base):
     full_name = Column(String(255), nullable=False)
     language_preference = Column(String(10), default="en")
     age = Column(Integer, nullable=True)
+    role = Column(String(20), default="patient")  # patient, provider, government
     
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)

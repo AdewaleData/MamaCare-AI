@@ -1,185 +1,223 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import toast from 'react-hot-toast';
+import { authApi } from '../../services/api';
+import { useMutation } from '@tanstack/react-query';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+import type { User } from '../../types';
 
-const schema = yup.object({
-  email: yup
-    .string()
-    .email('Please enter a valid email address')
-    .required('Email is required'),
-  password: yup
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .required('Password is required'),
-  rememberMe: yup.boolean(),
-});
-
-type LoginFormData = yup.InferType<typeof schema>;
-
-export const LoginPage: React.FC = () => {
-  const { login, isLoading, error, clearError } = useAuthStore();
+export default function LoginPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  const from = (location.state as any)?.from?.pathname || '/dashboard';
+  const { setAuth } = useAuthStore();
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: yupResolver(schema),
+  const loginMutation = useMutation({
+    mutationFn: authApi.login,
+    onSuccess: (data) => {
+      try {
+        console.log('Login response data:', data);
+        if (!data.access_token) {
+          setErrors({ general: 'Invalid login response. Please try again.' });
+          return;
+        }
+
+        // Set auth state immediately - this updates both store and localStorage
+        if (data.user) {
+          setAuth(data.user, data.access_token);
+          console.log('Auth set successfully');
+          
+          // Navigate immediately - no delays needed
+          const role = data.user.role || 'patient';
+          let targetPath = '/dashboard';
+          if (role === 'provider') {
+            targetPath = '/provider-dashboard';
+          } else if (role === 'government') {
+            targetPath = '/government-dashboard';
+          }
+          
+          console.log('Navigating to:', targetPath);
+          // Use window.location for immediate navigation to avoid React Router issues
+          window.location.href = targetPath;
+        } else {
+          // Fallback: if user not in response, fetch it
+          localStorage.setItem('access_token', data.access_token);
+          authApi.getCurrentUser()
+            .then((user) => {
+              setAuth(user, data.access_token);
+              const role = user.role || 'patient';
+              let targetPath = '/dashboard';
+              if (role === 'provider') {
+                targetPath = '/provider-dashboard';
+              } else if (role === 'government') {
+                targetPath = '/government-dashboard';
+              }
+              window.location.href = targetPath;
+            })
+            .catch((error) => {
+              console.error('Failed to fetch user:', error);
+              setErrors({ general: 'Login successful but failed to load user data. Please refresh.' });
+              localStorage.removeItem('access_token');
+            });
+        }
+      } catch (error: any) {
+        console.error('Login success handler error:', error);
+        setErrors({ general: 'Failed to complete login. Please try again.' });
+        localStorage.removeItem('access_token');
+      }
+    },
+    onError: (error: any) => {
+      console.error('Login API error:', error);
+      const message = error.response?.data?.detail || error.message || 'Login failed. Please check your credentials.';
+      setErrors({ general: message });
+    },
   });
 
-  useEffect(() => {
-    clearError();
-  }, [clearError]);
+  const validate = () => {
+    const newErrors: { email?: string; password?: string } = {};
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  const onSubmit = async (data: LoginFormData) => {
-    try {
-      await login(data.email, data.password);
-      toast.success('Welcome back!');
-      navigate(from, { replace: true });
-    } catch (error) {
-      // Error is handled by the store
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
+    if (validate()) {
+      loginMutation.mutate(formData);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-primary-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">MC</span>
+    <div className="min-h-screen flex items-center justify-center relative px-4 py-12">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url(/pregnant-woman.jpg)',
+        }}
+      >
+        {/* Overlay for form readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-900/85 via-primary-800/80 to-primary-900/85"></div>
+      </div>
+      
+      <div className="max-w-md w-full relative z-10">
+        {/* Logo and Title */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="bg-white/95 p-4 rounded-2xl shadow-lg backdrop-blur-sm">
+              <img src="/logo.jpeg" alt="MamaCare AI Logo" className="h-12 w-12 object-contain" />
+            </div>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-neutral-900">
-            Welcome back
-          </h2>
-          <p className="mt-2 text-sm text-neutral-600">
-            Sign in to your MamaCare AI account
-          </p>
+          <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Welcome to MamaCare AI</h1>
+          <p className="text-white/90 drop-shadow-md">Sign in to manage your pregnancy health</p>
         </div>
 
-        {/* Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4">
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-neutral-700">
-                Email address
-              </label>
-              <input
-                {...register('email')}
-                type="email"
-                autoComplete="email"
-                className="input mt-1"
-                placeholder="Enter your email"
-              />
-              {errors.email && (
-                <p className="mt-1 text-sm text-danger-600">{errors.email.message}</p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
-                Password
-              </label>
-              <input
-                {...register('password')}
-                type="password"
-                autoComplete="current-password"
-                className="input mt-1"
-                placeholder="Enter your password"
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-danger-600">{errors.password.message}</p>
-              )}
-            </div>
-
-            {/* Remember me */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  {...register('rememberMe')}
-                  type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded"
-                />
-                <label htmlFor="rememberMe" className="ml-2 block text-sm text-neutral-700">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <Link
-                  to="/forgot-password"
-                  className="font-medium text-primary-600 hover:text-primary-500"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Error message */}
-          {error && (
-            <div className="rounded-md bg-danger-50 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-danger-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-danger-800">{error}</p>
-                </div>
-              </div>
+        {/* Login Form */}
+        <div className="card">
+          {errors.general && (
+            <div className="mb-4 p-3 bg-danger-50 border border-danger-200 rounded-lg text-danger-700 text-sm" role="alert">
+              {errors.general}
             </div>
           )}
 
-          {/* Submit button */}
-          <div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className={`input ${errors.email ? 'border-danger-500 focus:ring-danger-500' : ''}`}
+                placeholder="you@example.com"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+                autoComplete="email"
+                required
+              />
+              {errors.email && (
+                <p id="email-error" className="mt-1 text-sm text-danger-600" role="alert">
+                  {errors.email}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className={`input pr-10 ${errors.password ? 'border-danger-500 focus:ring-danger-500' : ''}`}
+                  placeholder="Enter your password"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? 'password-error' : undefined}
+                  autoComplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+              {errors.password && (
+                <p id="password-error" className="mt-1 text-sm text-danger-600" role="alert">
+                  {errors.password}
+                </p>
+              )}
+            </div>
+
             <button
               type="submit"
-              disabled={isLoading}
-              className="btn btn-primary w-full"
+              disabled={loginMutation.isPending}
+              className="w-full btn-primary py-3 text-base font-semibold flex items-center justify-center"
             >
-              {isLoading ? (
-                <LoadingSpinner size="sm" />
+              {loginMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Signing in...
+                </>
               ) : (
-                'Sign in'
+                'Sign In'
               )}
             </button>
-          </div>
+          </form>
 
-          {/* Sign up link */}
-          <div className="text-center">
-            <p className="text-sm text-neutral-600">
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <Link
-                to="/register"
-                className="font-medium text-primary-600 hover:text-primary-500"
-              >
-                Sign up here
+              <Link to="/register" className="font-medium text-primary-600 hover:text-primary-700">
+                Sign up
               </Link>
             </p>
           </div>
-        </form>
+        </div>
+
+        {/* Accessibility note */}
+        <p className="mt-6 text-center text-xs text-gray-500">
+          Secure login with encrypted authentication
+        </p>
       </div>
     </div>
   );
-};
+}
+

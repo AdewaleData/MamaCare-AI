@@ -13,13 +13,14 @@ class EmergencyContact(Base):
     
     name = Column(String(255), nullable=False)
     phone = Column(String(20), nullable=False)
-    contact_relationship = Column(String(100), nullable=True)
+    relationship_type = Column(String(100), nullable=True)  # Renamed from 'relationship' to avoid conflict
     is_primary = Column(Boolean, default=False)
     
     created_at = Column(DateTime, default=datetime.utcnow)
     
-    # Relationships
-    user = relationship("User", back_populates="emergency_contacts")
+    # Relationships - use string reference to avoid circular import
+    # The relationship will be properly configured when all models are loaded
+    user = relationship("User", back_populates="emergency_contacts", lazy="select")
     
     def __repr__(self):
         return f"<EmergencyContact {self.name}>"

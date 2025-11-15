@@ -15,6 +15,14 @@ class Pregnancy(Base):
     pregnancy_stage = Column(String(20), nullable=True)  # trimester1, trimester2, trimester3
     is_active = Column(Boolean, default=True)
     
+    # Additional fields
+    doctor_name = Column(String(100), nullable=True)
+    hospital_name = Column(String(100), nullable=True)
+    blood_type = Column(String(10), nullable=True)
+    notes = Column(String(1000), nullable=True)
+    current_week = Column(Integer, nullable=True)
+    trimester = Column(Integer, nullable=True)
+    
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
