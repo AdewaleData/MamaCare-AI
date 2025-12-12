@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        "sqlite:///./mamacare.db"
+        "sqlite:///./mamacare-ai.db"
     )
     
     # Security

@@ -102,7 +102,7 @@ export default function LoginPage() {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: 'url(/pregnant-woman.jpg)',
+          backgroundImage: 'url(/pregnant_women.jpg)',
         }}
       >
         {/* Animated gradient overlay */}

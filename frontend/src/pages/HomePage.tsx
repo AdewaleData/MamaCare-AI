@@ -22,7 +22,7 @@ export default function HomePage() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: 'url(/pregnant-woman.jpg)',
+            backgroundImage: 'url(/pregnant_women.jpg)',
           }}
         >
           {/* Animated gradient overlay */}
@@ -69,7 +69,7 @@ export default function HomePage() {
               <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
                 {/* Actual image */}
                 <img
-                  src="/pregnant-woman.jpg"
+                  src="/pregnant_women.jpg"
                   alt="African Pregnant Woman - Beautiful, Strong, Empowered"
                   className="w-full h-auto object-cover aspect-[4/5]"
                 />
