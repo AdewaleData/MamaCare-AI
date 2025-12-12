@@ -56,40 +56,8 @@ export default function RiskGauge({ riskLevel, riskScore }: RiskGaugeProps) {
 
   return (
     <div className="flex flex-col items-center justify-center py-6">
-      {/* Risk Gauge */}
+      {/* Risk Gauge - Simplified without arc */}
       <div className="relative w-full max-w-md h-64 flex items-center justify-center">
-        {/* Semi-circular gauge - single color based on risk level */}
-        <svg
-          width="100%"
-          height="200"
-          viewBox="0 0 400 200"
-          className="absolute"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          {/* Single arc gauge - color changes based on risk level */}
-          <path
-            d="M 80 200 A 120 120 0 0 1 320 200"
-            fill="none"
-            stroke={gaugeColor}
-            strokeWidth="20"
-            strokeLinecap="round"
-            strokeOpacity="0.2"
-            className="transition-all duration-500"
-          />
-          {/* Active portion based on risk score */}
-          <path
-            d={`M 80 200 A 120 120 0 ${arrowRotation > 0 ? 1 : 0} 1 ${
-              200 + 120 * Math.cos((arrowRotation * Math.PI) / 180)
-            } ${200 + 120 * Math.sin((arrowRotation * Math.PI) / 180)}`}
-            fill="none"
-            stroke={gaugeColor}
-            strokeWidth="20"
-            strokeLinecap="round"
-            className="transition-all duration-700"
-            style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-          />
-        </svg>
-
         {/* Central RISK dial with arrow */}
         <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
           {/* Arrow pointer - rotates based on risk score */}

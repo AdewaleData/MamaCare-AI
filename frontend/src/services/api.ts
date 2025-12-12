@@ -133,6 +133,72 @@ export const pregnancyApi = {
   deactivate: async (id: string): Promise<void> => {
     await api.delete(`/pregnancy/${id}`);
   },
+
+  confirmProvider: async (id: string): Promise<{ message: string; provider_confirmed: boolean }> => {
+    const response = await api.post(`/pregnancy/${id}/confirm-provider`);
+    return response.data;
+  },
+};
+
+// Providers API
+export interface Provider {
+  id: string;
+  full_name: string;
+  email: string;
+  phone?: string;
+  organization_name?: string;
+  license_number?: string;
+  verification_status?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  latitude?: number;
+  longitude?: number;
+  distance_km?: number;
+}
+
+export interface ProviderSearchParams {
+  search?: string;
+  organization?: string;
+  verified_only?: boolean;
+  latitude?: number;
+  longitude?: number;
+  radius_km?: number;
+  sort_by?: 'name' | 'distance';
+}
+
+export const providersApi = {
+  list: async (params?: ProviderSearchParams): Promise<Provider[]> => {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params?.search) searchParams.append('search', params.search);
+      if (params?.organization) searchParams.append('organization', params.organization);
+      if (params?.latitude !== undefined) searchParams.append('latitude', params.latitude.toString());
+      if (params?.longitude !== undefined) searchParams.append('longitude', params.longitude.toString());
+      if (params?.radius_km !== undefined) searchParams.append('radius_km', params.radius_km.toString());
+      // Always include sort_by, default to 'name' if not specified
+      searchParams.append('sort_by', params?.sort_by || 'name');
+      // Always include verified_only, default to false to show all providers
+      searchParams.append('verified_only', (params?.verified_only ?? false).toString());
+      
+      const url = `/providers?${searchParams.toString()}`;
+      console.log('[providersApi] Calling:', url);
+      const response = await api.get(url);
+      console.log('[providersApi] Response:', response.status, response.data?.length || 0, 'providers');
+      return response.data;
+    } catch (error: any) {
+      console.error('[providersApi] Error:', error);
+      console.error('[providersApi] Error response:', error.response?.status, error.response?.data);
+      console.error('[providersApi] Error URL:', error.config?.url);
+      throw error;
+    }
+  },
+
+  get: async (id: string): Promise<Provider> => {
+    const response = await api.get(`/providers/${id}`);
+    return response.data;
+  },
 };
 
 // Health Records API
@@ -246,6 +312,86 @@ export const recommendationsApi = {
   },
 };
 
+// Chat API
+export interface Message {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  content: string;
+  is_read: boolean;
+  read_at: string | null;
+  created_at: string;
+  updated_at: string;
+  sender_name?: string;
+  receiver_name?: string;
+}
+
+export interface Conversation {
+  other_user_id: string;
+  other_user_name: string;
+  other_user_role: string;
+  last_message: Message | null;
+  unread_count: number;
+  updated_at: string;
+}
+
+export interface MessageCreate {
+  receiver_id: string;
+  content: string;
+}
+
+export const chatApi = {
+  sendMessage: async (data: MessageCreate): Promise<Message> => {
+    const response = await api.post('/chat/send', data);
+    return response.data;
+  },
+
+  getConversations: async (limit = 50, offset = 0): Promise<{ conversations: Conversation[]; total: number }> => {
+    try {
+      console.log('[Chat API] Fetching conversations with limit:', limit, 'offset:', offset);
+      const response = await api.get('/chat/conversations', {
+        params: { limit, offset },
+      });
+      console.log('[Chat API] Conversations response:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('[Chat API] Error fetching conversations:', error);
+      console.error('[Chat API] Error response:', error.response?.data);
+      console.error('[Chat API] Error status:', error.response?.status);
+      throw error;
+    }
+  },
+
+  getConversation: async (otherUserId: string, limit = 50, offset = 0): Promise<Message[]> => {
+    const response = await api.get(`/chat/conversation/${otherUserId}`, {
+      params: { limit, offset },
+    });
+    return response.data;
+  },
+
+  markMessageRead: async (messageId: string): Promise<void> => {
+    await api.post(`/chat/mark-read/${messageId}`);
+  },
+
+  getAvailableUsers: async (): Promise<{ users: Array<{ id: string; name: string; role: string; email: string }>; total: number }> => {
+    try {
+      console.log('[Chat API] Fetching available users...');
+      const response = await api.get('/chat/available-users');
+      console.log('[Chat API] Available users response:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('[Chat API] Error fetching available users:', error);
+      console.error('[Chat API] Error response:', error.response?.data);
+      throw error;
+    }
+  },
+
+  getOnlineUsers: async (): Promise<{ online_user_ids: string[] }> => {
+    const response = await api.get('/chat/online-users');
+    return response.data;
+  },
+};
+
 // Appointments API
 export interface Appointment {
   id: string;
@@ -255,6 +401,20 @@ export interface Appointment {
   clinic_address: string;
   appointment_type: string;
   status: string;
+  notes?: string | null;
+  provider_notes?: string | null;
+  patient_name?: string;
+  patient_id?: string;
+  patient?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  pregnancy?: {
+    id: string;
+    due_date: string;
+    current_week: number;
+  };
 }
 
 export interface AppointmentCreate {
@@ -265,6 +425,11 @@ export interface AppointmentCreate {
   appointment_type: string;
 }
 
+export interface AppointmentStatusUpdate {
+  status: string;
+  provider_notes?: string | null;
+}
+
 export const appointmentsApi = {
   create: async (data: AppointmentCreate): Promise<Appointment> => {
     const response = await api.post('/appointments/', data);
@@ -273,6 +438,34 @@ export const appointmentsApi = {
 
   getByPregnancy: async (pregnancyId: string): Promise<{ appointments: Appointment[]; total: number }> => {
     const response = await api.get(`/appointments/${pregnancyId}`);
+    return response.data;
+  },
+
+  // Provider endpoints
+  getPending: async (): Promise<{ appointments: Appointment[]; total: number }> => {
+    const response = await api.get('/appointments/provider/pending');
+    return response.data;
+  },
+
+  getAll: async (statusFilter?: string): Promise<{ appointments: Appointment[]; total: number }> => {
+    const response = await api.get('/appointments/provider/all', {
+      params: statusFilter ? { status_filter: statusFilter } : {},
+    });
+    return response.data;
+  },
+
+  getDetails: async (appointmentId: string): Promise<Appointment> => {
+    const response = await api.get(`/appointments/provider/${appointmentId}`);
+    return response.data;
+  },
+
+  accept: async (appointmentId: string, data: AppointmentStatusUpdate): Promise<Appointment> => {
+    const response = await api.post(`/appointments/provider/${appointmentId}/accept`, data);
+    return response.data;
+  },
+
+  decline: async (appointmentId: string, data: AppointmentStatusUpdate): Promise<Appointment> => {
+    const response = await api.post(`/appointments/provider/${appointmentId}/decline`, data);
     return response.data;
   },
 };
@@ -476,6 +669,17 @@ export const subscriptionsApi = {
     const response = await api.get('/subscriptions/payment/history', { params: { limit } });
     return response.data;
   },
+
+  getBankDetails: async (): Promise<{
+    account_number: string;
+    account_name: string;
+    bank_name: string;
+    support_email: string;
+    support_phone: string;
+  }> => {
+    const response = await api.get('/subscriptions/bank-details');
+    return response.data;
+  },
 };
 
 // Offline Sync API
@@ -528,8 +732,15 @@ export const offlineApi = {
 // Dashboard API - Add regional endpoint
 export const dashboardApi = {
   getProvider: async (): Promise<any> => {
+    try {
     const response = await api.get('/dashboards/provider');
+      console.log('[Dashboard API] Provider dashboard response:', response.data);
     return response.data;
+    } catch (error: any) {
+      console.error('[Dashboard API] Error fetching provider dashboard:', error);
+      console.error('[Dashboard API] Error response:', error.response?.data);
+      throw error;
+    }
   },
 
   getGovernment: async (): Promise<any> => {
@@ -544,6 +755,46 @@ export const dashboardApi = {
 
   getRegionalStats: async (region?: string): Promise<any> => {
     const response = await api.get('/dashboards/government/regional', { params: { region } });
+    return response.data;
+  },
+};
+
+// Voice Assistant API
+export const voiceApi = {
+  getSummary: async (useLlm: boolean = false, language?: string, pageType?: string): Promise<{
+    summary: string;
+    language: string;
+    page_type: string;
+    cached: boolean;
+    timestamp: string;
+    source: string;
+    cloud_tts_available?: boolean;
+  }> => {
+    const params: any = {};
+    if (useLlm) params.use_llm = 'true';
+    if (language) params.language = language;
+    // Always include page_type, default to 'dashboard' if not provided
+    params.page_type = pageType || 'dashboard';
+    
+    console.log('[API] Calling voice/summarize with params:', params);
+    const response = await api.get('/voice/summarize', { params });
+    console.log('[API] Voice summary response:', response.data);
+    return response.data;
+  },
+  
+  generateSpeech: async (text: string, language: string): Promise<Blob> => {
+    const response = await api.post('/voice/speak', null, {
+      params: { text, language },
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+  
+  getTtsStatus: async (): Promise<{
+    available: boolean;
+    supported_languages: string[];
+  }> => {
+    const response = await api.get('/voice/tts-status');
     return response.data;
   },
 };

@@ -22,18 +22,20 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
     queryKey: ['translations', language],
     queryFn: async () => {
       try {
+        console.log('Fetching translations for language:', language);
         const response = await api.get(`/translations?language=${language}`);
+        console.log('Translations received:', Object.keys(response.data || {}).length, 'keys');
         return response.data || {};
       } catch (error: any) {
+        console.error('Error fetching translations:', error);
         // Silently fail - return empty object, app will work without translations
-        // Don't log errors for translations as they're not critical
         return {};
       }
     },
     enabled: true, // Always enabled, will use 'en' as default
     staleTime: 0, // Always refetch when language changes (language is in queryKey)
-    cacheTime: 0, // Don't cache - always fetch fresh
-    retry: 0, // Don't retry on error
+    gcTime: 0, // Don't cache - always fetch fresh (using gcTime instead of cacheTime in newer versions)
+    retry: 1, // Retry once on error
     refetchOnWindowFocus: false,
     refetchOnMount: true, // Refetch when language changes (language is in queryKey)
     refetchOnReconnect: false,

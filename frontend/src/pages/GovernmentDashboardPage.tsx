@@ -32,10 +32,12 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import React, { useState } from 'react';
+import { useTranslation } from '../contexts/TranslationContext';
 
 const COLORS = ['#10b981', '#f59e0b', '#ef4444'];
 
 export default function GovernmentDashboardPage() {
+  const { t } = useTranslation();
   const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined);
 
   const { data: dashboard, isLoading } = useQuery({
@@ -126,7 +128,7 @@ export default function GovernmentDashboardPage() {
   }
 
   if (!dashboard) {
-    return <div className="text-center py-8">No dashboard data available</div>;
+      return <div className="text-center py-8">{t('no_dashboard_data_available', 'No dashboard data available')}</div>;
   }
 
   const riskDistributionData = [
@@ -156,9 +158,9 @@ export default function GovernmentDashboardPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Government Health Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('government_health_dashboard', 'Government Health Dashboard')}</h1>
         <p className="mt-2 text-gray-600">
-          Population-level maternal health statistics and impact metrics
+          {t('population_level_maternal_health_statistics', 'Population-level maternal health statistics and impact metrics')}
         </p>
       </div>
 
@@ -284,102 +286,139 @@ export default function GovernmentDashboardPage() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Real-time Population Trends */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">30-Day Population Trends</h2>
+        <div className="card hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">30-Day Population Trends</h2>
             <div className="flex items-center space-x-2 text-sm text-gray-500">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span>Live</span>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={350}>
-            <AreaChart data={formattedTrendData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <ResponsiveContainer width="100%" height={380}>
+            <AreaChart data={formattedTrendData} margin={{ top: 20, right: 30, left: 10, bottom: 10 }}>
               <defs>
                 <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1} />
+                  <stop offset="0%" stopColor="#0284c7" stopOpacity={0.9} />
+                  <stop offset="50%" stopColor="#0ea5e9" stopOpacity={0.6} />
+                  <stop offset="100%" stopColor="#38bdf8" stopOpacity={0.15} />
                 </linearGradient>
                 <linearGradient id="colorPregnancies" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0.1} />
+                  <stop offset="0%" stopColor="#16a34a" stopOpacity={0.9} />
+                  <stop offset="50%" stopColor="#22c55e" stopOpacity={0.6} />
+                  <stop offset="100%" stopColor="#4ade80" stopOpacity={0.15} />
                 </linearGradient>
                 <linearGradient id="colorAssessments" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.1} />
+                  <stop offset="0%" stopColor="#d97706" stopOpacity={0.9} />
+                  <stop offset="50%" stopColor="#f59e0b" stopOpacity={0.6} />
+                  <stop offset="100%" stopColor="#fbbf24" stopOpacity={0.15} />
                 </linearGradient>
+                <filter id="shadowGov">
+                  <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.1"/>
+                </filter>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.4} vertical={false} />
               <XAxis 
                 dataKey="date_display" 
                 stroke="#6b7280"
-                style={{ fontSize: '12px' }}
+                style={{ fontSize: '12px', fontWeight: 500 }}
                 interval="preserveStartEnd"
+                tickLine={false}
+                axisLine={{ stroke: '#e5e7eb' }}
               />
               <YAxis 
                 stroke="#6b7280"
-                style={{ fontSize: '12px' }}
+                style={{ fontSize: '12px', fontWeight: 500 }}
+                tickLine={false}
+                axisLine={{ stroke: '#e5e7eb' }}
               />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.98)',
                   border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  padding: '12px'
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                  fontSize: '13px',
+                  fontWeight: 500
                 }}
+                labelStyle={{ 
+                  color: '#111827', 
+                  fontWeight: 600, 
+                  marginBottom: '8px',
+                  fontSize: '13px'
+                }}
+                cursor={{ stroke: '#6b7280', strokeWidth: 1, strokeDasharray: '5 5' }}
               />
               <Legend 
-                wrapperStyle={{ paddingTop: '20px' }}
+                wrapperStyle={{ paddingTop: '20px', fontSize: '13px', fontWeight: 500 }}
                 iconType="circle"
+                iconSize={12}
               />
               <Area
                 type="monotone"
                 dataKey="users"
-                stroke="#3b82f6"
-                strokeWidth={2}
+                stroke="#0284c7"
+                strokeWidth={3}
                 fillOpacity={1}
                 fill="url(#colorUsers)"
                 name="New Users"
+                dot={{ fill: '#0284c7', r: 4, strokeWidth: 2, stroke: '#fff' }}
+                activeDot={{ r: 7, stroke: '#fff', strokeWidth: 3, fill: '#0284c7' }}
+                style={{ filter: 'url(#shadowGov)' }}
               />
               <Area
                 type="monotone"
                 dataKey="pregnancies"
-                stroke="#10b981"
-                strokeWidth={2}
+                stroke="#16a34a"
+                strokeWidth={3}
                 fillOpacity={1}
                 fill="url(#colorPregnancies)"
                 name="New Pregnancies"
+                dot={{ fill: '#16a34a', r: 4, strokeWidth: 2, stroke: '#fff' }}
+                activeDot={{ r: 7, stroke: '#fff', strokeWidth: 3, fill: '#16a34a' }}
+                style={{ filter: 'url(#shadowGov)' }}
               />
               <Area
                 type="monotone"
                 dataKey="assessments"
-                stroke="#f59e0b"
-                strokeWidth={2}
+                stroke="#d97706"
+                strokeWidth={3}
                 fillOpacity={1}
                 fill="url(#colorAssessments)"
                 name="Risk Assessments"
+                dot={{ fill: '#d97706', r: 4, strokeWidth: 2, stroke: '#fff' }}
+                activeDot={{ r: 7, stroke: '#fff', strokeWidth: 3, fill: '#d97706' }}
+                style={{ filter: 'url(#shadowGov)' }}
               />
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
         {/* Risk Distribution */}
-        <div className="card">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Risk Level Distribution</h2>
-          <ResponsiveContainer width="100%" height={350}>
+        <div className="card hover:shadow-xl transition-all duration-300">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Risk Level Distribution</h2>
+          <ResponsiveContainer width="100%" height={380}>
             <PieChart>
+              <defs>
+                <filter id="shadowGovPie">
+                  <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.15"/>
+                </filter>
+              </defs>
               <Pie
                 data={riskDistributionData}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
                 label={({ name, percent, value }) => 
-                  `${name}\n${value} (${(percent * 100).toFixed(1)}%)`
+                  value > 0 ? `${name}\n${value.toLocaleString()} (${(percent * 100).toFixed(1)}%)` : ''
                 }
-                outerRadius={100}
+                outerRadius={110}
+                innerRadius={40}
                 fill="#8884d8"
                 dataKey="value"
                 stroke="#fff"
-                strokeWidth={2}
+                strokeWidth={3}
+                style={{ filter: 'url(#shadowGovPie)' }}
               >
                 {riskDistributionData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -387,11 +426,25 @@ export default function GovernmentDashboardPage() {
               </Pie>
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.98)',
                   border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  padding: '12px'
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                  fontSize: '13px',
+                  fontWeight: 500
                 }}
+                formatter={(value: any, name: string) => [
+                  <span key="value" style={{ fontWeight: 600, color: '#111827' }}>
+                    {value.toLocaleString()} cases
+                  </span>,
+                  name
+                ]}
+              />
+              <Legend
+                wrapperStyle={{ paddingTop: '20px', fontSize: '13px', fontWeight: 500 }}
+                iconType="circle"
+                iconSize={12}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -662,6 +715,7 @@ export default function GovernmentDashboardPage() {
           </div>
         </div>
       </div>
+
     </div>
   );
 }

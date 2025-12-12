@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { pregnancyApi } from '../../services/api';
-import { Baby, Calendar, Heart, Save, Loader2, Edit2 } from 'lucide-react';
+import { Baby, Calendar, Heart, Save, Loader2, Edit2, CheckCircle, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import ProviderSelector from '../../components/ProviderSelector';
 
 export default function PregnancyPage() {
   const queryClient = useQueryClient();
@@ -140,18 +141,32 @@ export default function PregnancyPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Doctor Name
-              </label>
-              <input
-                type="text"
+            <div className="md:col-span-2">
+              <ProviderSelector
                 value={formData.doctor_name}
-                onChange={(e) => setFormData({ ...formData, doctor_name: e.target.value })}
-                className="input"
-                placeholder="Dr. Jane Smith"
+                onChange={(providerName) => setFormData({ ...formData, doctor_name: providerName })}
                 disabled={!isEditing}
               />
+              {pregnancy?.doctor_name && !isEditing && (
+                <div className="mt-2">
+                  {pregnancy.provider_confirmed ? (
+                    <div className="flex items-center text-sm text-success-600">
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      <span>Provider confirmed</span>
+                      {pregnancy.provider_confirmed_at && (
+                        <span className="ml-2 text-gray-500">
+                          on {format(new Date(pregnancy.provider_confirmed_at), 'MMM dd, yyyy')}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center text-sm text-warning-600">
+                      <Clock className="h-4 w-4 mr-1" />
+                      <span>Waiting for provider confirmation</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>

@@ -23,6 +23,10 @@ class Pregnancy(Base):
     current_week = Column(Integer, nullable=True)
     trimester = Column(Integer, nullable=True)
     
+    # Provider confirmation
+    provider_confirmed = Column(Boolean, default=False)  # Whether provider has confirmed accepting this patient
+    provider_confirmed_at = Column(DateTime, nullable=True)  # When provider confirmed
+    
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

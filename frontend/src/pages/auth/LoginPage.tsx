@@ -105,24 +105,26 @@ export default function LoginPage() {
           backgroundImage: 'url(/pregnant-woman.jpg)',
         }}
       >
-        {/* Overlay for form readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-900/85 via-primary-800/80 to-primary-900/85"></div>
+        {/* Animated gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-900/90 via-primary-800/85 to-primary-900/90"></div>
       </div>
       
-      <div className="max-w-md w-full relative z-10">
+      <div className="max-w-md w-full relative z-10 fade-in scale-in">
         {/* Logo and Title */}
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="bg-white/95 p-4 rounded-2xl shadow-lg backdrop-blur-sm">
-              <img src="/logo.jpeg" alt="MamaCare AI Logo" className="h-12 w-12 object-contain" />
+          <div className="flex justify-center mb-6">
+            <div className="glass-card p-5 rounded-3xl shadow-2xl border-2 border-white/30 transform hover:scale-110 hover:rotate-6 transition-all duration-300 float">
+              <img src="/logo.png" alt="MamaCare AI Logo" className="h-16 w-16 object-contain" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Welcome to MamaCare AI</h1>
-          <p className="text-white/90 drop-shadow-md">Sign in to manage your pregnancy health</p>
+          <h1 className="text-4xl font-bold text-white mb-3 drop-shadow-2xl text-gradient-animated">Welcome to MamaCare AI</h1>
+          <p className="text-lg text-white/95 drop-shadow-lg">
+            Sign in as Patient, Healthcare Provider, or Government Official
+          </p>
         </div>
 
         {/* Login Form */}
-        <div className="card">
+        <div className="glass-card card rounded-3xl shadow-2xl border-2 border-white/30 backdrop-blur-xl hover:shadow-3xl transition-all duration-300">
           {errors.general && (
             <div className="mb-4 p-3 bg-danger-50 border border-danger-200 rounded-lg text-danger-700 text-sm" role="alert">
               {errors.general}
@@ -189,7 +191,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full btn-primary py-3 text-base font-semibold flex items-center justify-center"
+              className="w-full btn-primary py-4 text-base font-bold flex items-center justify-center shadow-lg hover:shadow-xl"
             >
               {loginMutation.isPending ? (
                 <>

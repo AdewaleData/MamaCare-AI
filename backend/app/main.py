@@ -24,16 +24,18 @@ from app.models import (
     subscription,
     offline_sync,
     translation,
-    emergency_contact  # Import with other models
+    emergency_contact,
+    message  # Import message model
 )
 # Force relationship configuration by accessing the models
 # This ensures all relationships are properly resolved before API routers load
 _ = user_model.User
 _ = pregnancy_model.Pregnancy
 _ = emergency_contact.EmergencyContact
+_ = message.Message  # Force Message model to resolve relationships
 
 # Now import API routers (after models are loaded)
-from app.api.v1 import auth, health, predictions, appointments, emergency, pregnancy, recommendations, websocket, statistics, dashboards, hospitals, offline, translations, subscriptions
+from app.api.v1 import auth, health, predictions, appointments, emergency, pregnancy, recommendations, websocket, statistics, dashboards, hospitals, offline, translations, subscriptions, voice, chat, providers
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -93,6 +95,7 @@ app.include_router(predictions.router, prefix="/api/v1/predictions", tags=["Risk
 app.include_router(appointments.router, prefix="/api/v1/appointments", tags=["Appointments"])
 app.include_router(emergency.router, prefix="/api/v1/emergency", tags=["Emergency"])
 app.include_router(pregnancy.router, prefix="/api/v1", tags=["Pregnancy"])
+app.include_router(providers.router, prefix="/api/v1", tags=["Providers"])
 app.include_router(recommendations.router, prefix="/api/v1", tags=["Recommendations"])
 app.include_router(statistics.router, prefix="/api/v1/statistics", tags=["Statistics"])
 app.include_router(dashboards.router, prefix="/api/v1/dashboards", tags=["Dashboards"])
@@ -100,6 +103,8 @@ app.include_router(hospitals.router, prefix="/api/v1/hospitals", tags=["Hospital
 app.include_router(offline.router, prefix="/api/v1/offline", tags=["Offline Sync"])
 app.include_router(translations.router, prefix="/api/v1/translations", tags=["Translations"])
 app.include_router(subscriptions.router, prefix="/api/v1/subscriptions", tags=["Subscriptions"])
+app.include_router(voice.router, prefix="/api/v1/voice", tags=["Voice Assistant"])
+app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
 app.include_router(websocket.router, tags=["WebSocket"])
 
 

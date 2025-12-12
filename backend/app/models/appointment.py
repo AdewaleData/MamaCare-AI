@@ -15,8 +15,10 @@ class Appointment(Base):
     clinic_name = Column(String(255), nullable=True)
     clinic_address = Column(Text, nullable=True)
     appointment_type = Column(String(100), nullable=True)
-    status = Column(String(20), default="scheduled")  # scheduled, completed, cancelled
+    status = Column(String(20), default="pending")  # pending, accepted, declined, scheduled, completed, cancelled
+    provider_id = Column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)  # Assigned provider
     notes = Column(Text, nullable=True)
+    provider_notes = Column(Text, nullable=True)  # Notes from provider when accepting/declining
     
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

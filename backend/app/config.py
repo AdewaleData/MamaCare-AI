@@ -100,6 +100,13 @@ class Settings(BaseSettings):
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     
+    # Bank Transfer Settings
+    BANK_ACCOUNT_NUMBER: str = os.getenv("BANK_ACCOUNT_NUMBER", "1234567890")
+    BANK_ACCOUNT_NAME: str = os.getenv("BANK_ACCOUNT_NAME", "MamaCare AI Limited")
+    BANK_NAME: str = os.getenv("BANK_NAME", "Access Bank")
+    BANK_SUPPORT_EMAIL: str = os.getenv("BANK_SUPPORT_EMAIL", "support@mamacare.ai")
+    BANK_SUPPORT_PHONE: str = os.getenv("BANK_SUPPORT_PHONE", "+234-XXX-XXXX-XXXX")
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

@@ -9,6 +9,7 @@ from app.models.user import User
 from app.api.v1.dependencies import get_current_user
 from app.utils.sms import SMSService
 from app.utils.websocket_manager import manager
+from app.models.emergency_alert import EmergencyAlert
 from typing import Optional
 from datetime import datetime, timedelta, timezone
 import logging
@@ -18,6 +19,117 @@ router = APIRouter()
 
 prediction_service = PredictionService()
 specialized_predictor = SpecializedPredictor()
+
+
+async def trigger_automatic_emergency_alert(
+    user_id: str,
+    pregnancy_id: str,
+    risk_assessment_id: Optional[str],
+    risk_score: float,
+    risk_factors: list
+):
+    """
+    Automatically trigger emergency alert when high risk is detected
+    This runs in background to avoid blocking the API response
+    """
+    from app.database import SessionLocal
+    from app.models.user import User
+    from app.models.pregnancy import Pregnancy
+    from sqlalchemy import text
+    
+    db = SessionLocal()
+    try:
+        # Get user and pregnancy
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            logger.error(f"User {user_id} not found for emergency alert")
+            return
+        
+        pregnancy = db.query(Pregnancy).filter(Pregnancy.id == pregnancy_id).first()
+        
+        # Create emergency alert automatically
+        emergency_alert = EmergencyAlert(
+            user_id=user_id,
+            pregnancy_id=pregnancy_id,
+            emergency_type="medical",
+            severity="critical",  # High risk = critical emergency
+            description=f"Automatic emergency alert: HIGH RISK detected (Risk Score: {risk_score:.1f}%). Risk factors: {', '.join(risk_factors[:3]) if risk_factors else 'Multiple risk factors detected'}. Immediate medical attention required.",
+            status="active"
+        )
+        
+        db.add(emergency_alert)
+        db.commit()
+        db.refresh(emergency_alert)
+        
+        logger.warning(f"🚨 AUTOMATIC EMERGENCY ALERT CREATED: {emergency_alert.id} for user {user_id}")
+        
+        # Immediately notify emergency contacts
+        # Get primary contacts first
+        sql_query = text("""
+            SELECT phone FROM emergency_contacts 
+            WHERE user_id = :user_id AND is_primary = 1
+            LIMIT 5
+        """)
+        result = db.execute(sql_query, {"user_id": user_id})
+        rows = result.fetchall()
+        phone_numbers = [str(row[0]) for row in rows if row[0]]
+        
+        # If no primary contacts, get any contacts
+        if not phone_numbers:
+            sql_query = text("""
+                SELECT phone FROM emergency_contacts 
+                WHERE user_id = :user_id
+                LIMIT 5
+            """)
+            result = db.execute(sql_query, {"user_id": user_id})
+            rows = result.fetchall()
+            phone_numbers = [str(row[0]) for row in rows if row[0]]
+        
+        # Send emergency SMS to contacts immediately
+        if phone_numbers:
+            risk_factors_text = ', '.join(risk_factors[:3]) if risk_factors else 'Multiple risk factors'
+            message = (
+                f"🚨 EMERGENCY ALERT - HIGH RISK DETECTED\n\n"
+                f"{user.full_name} has been identified as HIGH RISK (Risk Score: {risk_score:.1f}%).\n\n"
+                f"Risk Factors: {risk_factors_text}\n\n"
+                f"⚠️ IMMEDIATE ACTION REQUIRED:\n"
+                f"Please contact {user.full_name} immediately and ensure they seek medical attention within 24-48 hours.\n\n"
+                f"Alert ID: {emergency_alert.id[:8]}\n"
+                f"Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}"
+            )
+            
+            try:
+                result = await SMSService.send_sms_twilio(phone_numbers, message)
+                logger.warning(f"🚨 Emergency SMS sent to {len(phone_numbers)} contacts: {result}")
+                
+                # Mark contacts as notified
+                emergency_alert.contacts_notified = True
+                db.commit()
+            except Exception as sms_error:
+                logger.error(f"Error sending emergency SMS: {sms_error}")
+        else:
+            logger.warning(f"⚠️ No emergency contacts found for user {user_id} - emergency alert created but no contacts notified")
+        
+        # Also send SMS to user if they have a phone
+        if user.phone:
+            user_message = (
+                f"🚨 HIGH RISK ALERT\n\n"
+                f"Your health assessment shows HIGH RISK (Score: {risk_score:.1f}%).\n\n"
+                f"Risk Factors: {', '.join(risk_factors[:3]) if risk_factors else 'Multiple risk factors'}\n\n"
+                f"⚠️ Please contact your healthcare provider immediately (within 24-48 hours).\n\n"
+                f"Visit a Primary Healthcare Centre (PHC) or General Hospital.\n"
+                f"For emergencies, call 112."
+            )
+            try:
+                await SMSService.send_sms_twilio([user.phone], user_message)
+                logger.info(f"High risk alert SMS sent to user {user.phone}")
+            except Exception as user_sms_error:
+                logger.error(f"Error sending SMS to user: {user_sms_error}")
+        
+    except Exception as e:
+        logger.error(f"Error in automatic emergency alert: {e}", exc_info=True)
+    finally:
+        db.close()
 
 
 @router.post("/assess", response_model=PredictionResponse)
@@ -205,14 +317,25 @@ async def assess_risk(
             }
         }
         
-        # Send real-time alerts for HIGH risk (background tasks)
+        # AUTOMATIC EMERGENCY ALERT for HIGH risk - triggers immediately
         if prediction.risk_level == "High" and current_user:
             # Get risk assessment ID for alerts
             risk_assessment = db.query(RiskAssessment).filter(
                 RiskAssessment.pregnancy_id == request.pregnancy_id
             ).order_by(RiskAssessment.assessed_at.desc()).first()
             
-            # Schedule SMS alert
+            # IMMEDIATELY trigger emergency alert (not background task - needs to happen now)
+            logger.warning(f"🚨 HIGH RISK DETECTED for user {current_user.id} - Triggering automatic emergency alert")
+            background_tasks.add_task(
+                trigger_automatic_emergency_alert,
+                current_user.id,
+                request.pregnancy_id,
+                str(risk_assessment.id) if risk_assessment else None,
+                float(prediction.risk_score),
+                prediction.risk_factors
+            )
+            
+            # Schedule SMS alert to user
             if current_user.phone:
                 background_tasks.add_task(
                     SMSService.send_alert_sms,

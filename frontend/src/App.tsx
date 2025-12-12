@@ -19,9 +19,12 @@ import EmergencyPage from './pages/EmergencyPage';
 import EmergencyContactsPage from './pages/EmergencyContactsPage';
 import ProfilePage from './pages/ProfilePage';
 import AppointmentsPage from './pages/AppointmentsPage';
+import ProviderAppointmentsPage from './pages/ProviderAppointmentsPage';
 import HospitalsPage from './pages/HospitalsPage';
 import RiskAssessmentHistoryPage from './pages/RiskAssessmentHistoryPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
+import ChatPage from './pages/ChatPage';
+import ProvidersPage from './pages/ProvidersPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   // Simple check: look in localStorage directly (most reliable)
@@ -57,10 +60,16 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   // Wait for initial check - show loading instead of blank
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-600 border-r-transparent"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-primary-50/30">
+        <div className="text-center fade-in">
+          <div className="relative">
+            <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary-200 border-r-primary-600"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-8 w-8 bg-primary-600 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <p className="mt-6 text-lg font-semibold text-gray-700">Loading MamaCare AI...</p>
+          <p className="mt-2 text-sm text-gray-500">Please wait</p>
         </div>
       </div>
     );
@@ -133,10 +142,13 @@ function App() {
           <Route path="risk-assessment/history" element={<RiskAssessmentHistoryPage />} />
           <Route path="risk-gauge-demo" element={<RiskGaugeDemo />} />
           <Route path="appointments" element={<AppointmentsPage />} />
+          <Route path="provider-appointments" element={<ProviderAppointmentsPage />} />
           <Route path="hospitals" element={<HospitalsPage />} />
+          <Route path="providers" element={<ProvidersPage />} />
           <Route path="subscriptions" element={<SubscriptionsPage />} />
           <Route path="emergency" element={<EmergencyPage />} />
           <Route path="emergency/contacts" element={<EmergencyContactsPage />} />
+          <Route path="chat" element={<ChatPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
         

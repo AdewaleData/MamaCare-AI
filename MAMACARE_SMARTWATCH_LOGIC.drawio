@@ -1,0 +1,185 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="MamaCare Smartwatch Logic" id="smartwatch-logic">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="3000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="MamaCare Smartwatch - Complete Feature Capture System" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Layer 1: Sensor Inputs -->
+        <mxCell id="layer1" value="SENSOR INPUTS (Direct Measurement)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="800" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ppg" value="PPG Sensor&#xa;Heart Rate: 72 bpm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" vertex="1" parent="1">
+          <mxGeometry x="150" y="200" width="150" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="temp" value="Temperature Sensor&#xa;Wrist Temp: 35.5°C" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" vertex="1" parent="1">
+          <mxGeometry x="350" y="200" width="150" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="bp" value="BP Estimation&#xa;Systolic: 120&#xa;Diastolic: 80" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" vertex="1" parent="1">
+          <mxGeometry x="550" y="200" width="150" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="calibration" value="Calibration Module" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="1">
+          <mxGeometry x="750" y="200" width="150" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Layer 2: Manual Inputs -->
+        <mxCell id="layer2" value="MANUAL INPUTS (User/App Entry)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="320" width="800" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="profile" value="User Profile&#xa;Age: 28" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450" vertex="1" parent="1">
+          <mxGeometry x="150" y="420" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="history" value="Medical History&#xa;Prev Comp: 0&#xa;Preexist Diab: 0&#xa;Gest Diab: 0&#xa;Mental: 0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450" vertex="1" parent="1">
+          <mxGeometry x="320" y="420" width="150" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Layer 3: External Devices -->
+        <mxCell id="layer3" value="EXTERNAL DEVICES (Bluetooth)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="540" width="800" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="glucose" value="Glucose Monitor&#xa;Blood Sugar: 90 mg/dL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666" vertex="1" parent="1">
+          <mxGeometry x="250" y="640" width="150" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="scale" value="Weight Scale&#xa;Weight: 65 kg&#xa;Height: 1.60 m&#xa;BMI: 25.0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666" vertex="1" parent="1">
+          <mxGeometry x="450" y="640" width="150" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Feature Assembly -->
+        <mxCell id="assembly" value="FEATURE ASSEMBLY LAYER&#xa;11 Base Features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="780" width="800" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="features" value="[F1: HR=72, F2: Temp=38.0, F3: SBP=120, F4: DBP=80,&#xa;F5: BS=90, F6: BMI=25.0, F7: Age=28,&#xa;F8: Prev=0, F9: PreDiab=0, F10: GestDiab=0, F11: Mental=0]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left" vertex="1" parent="1">
+          <mxGeometry x="150" y="880" width="700" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Derived Features -->
+        <mxCell id="derived" value="DERIVED FEATURE CALCULATION&#xa;9 Calculated Features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="1020" width="800" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="calc1" value="BP Derived:&#xa;MAP = 93.33&#xa;Pulse Press = 40" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="1">
+          <mxGeometry x="150" y="1120" width="150" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="calc2" value="Threshold Checks:&#xa;Has_Hypertension = 0&#xa;Has_Diabetes = 0&#xa;Has_Fever = 1&#xa;Has_Tachycardia = 0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left" vertex="1" parent="1">
+          <mxGeometry x="350" y="1120" width="200" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="calc3" value="Risk Indicators:&#xa;Risk_Factor_Count = 0&#xa;Age_Risk = 0&#xa;BMI_Risk = 0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left" vertex="1" parent="1">
+          <mxGeometry x="600" y="1120" width="150" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Complete Array -->
+        <mxCell id="complete" value="COMPLETE FEATURE ARRAY&#xa;20 Features (11 Base + 9 Derived)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="1260" width="800" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="array20" value="[72, 38.0, 120, 80, 90, 25.0, 28, 0, 0, 0, 0,&#xa;93.33, 40, 0, 0, 1, 0, 0, 0, 0]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left" vertex="1" parent="1">
+          <mxGeometry x="150" y="1360" width="700" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Scaling -->
+        <mxCell id="scaling" value="FEATURE SCALING&#xa;StandardScaler Normalization" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="1480" width="800" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- ML Model -->
+        <mxCell id="mlmodel" value="ML MODEL (Gradient Boosting)&#xa;Input: 20 Scaled Features&#xa;Output: P(High Risk) = 0.25 (25%)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="1600" width="800" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Classification -->
+        <mxCell id="classification" value="RISK CLASSIFICATION&#xa;IF P(High) &lt; 40%: Low Risk&#xa;IF 40% ≤ P(High) &lt; 70%: Medium Risk&#xa;IF P(High) ≥ 70%: High Risk" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="1740" width="800" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Result -->
+        <mxCell id="result" value="RESULT DISPLAY&#xa;🟢 Low Risk (25%)&#xa;Recommendations..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="1880" width="800" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows -->
+        <mxCell id="arrow1" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="layer1" target="assembly">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="400" as="sourcePoint" />
+            <mxPoint x="550" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow2" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="layer2" target="assembly">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="500" as="sourcePoint" />
+            <mxPoint x="550" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow3" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="layer3" target="assembly">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="700" as="sourcePoint" />
+            <mxPoint x="550" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow4" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="assembly" target="derived">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="1000" as="sourcePoint" />
+            <mxPoint x="550" y="950" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow5" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="derived" target="complete">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="1300" as="sourcePoint" />
+            <mxPoint x="550" y="1250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow6" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="complete" target="scaling">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="1500" as="sourcePoint" />
+            <mxPoint x="550" y="1450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow7" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="scaling" target="mlmodel">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="1700" as="sourcePoint" />
+            <mxPoint x="550" y="1650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow8" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="mlmodel" target="classification">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="1900" as="sourcePoint" />
+            <mxPoint x="550" y="1850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow9" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="classification" target="result">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="2100" as="sourcePoint" />
+            <mxPoint x="550" y="2050" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+
+
+

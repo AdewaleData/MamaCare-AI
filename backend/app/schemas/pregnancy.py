@@ -33,6 +33,8 @@ class PregnancyResponse(PregnancyBase):
     current_week: Optional[int] = None
     trimester: Optional[int] = None
     is_active: bool
+    provider_confirmed: Optional[bool] = False
+    provider_confirmed_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
     

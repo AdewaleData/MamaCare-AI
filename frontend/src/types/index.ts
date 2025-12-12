@@ -43,6 +43,8 @@ export interface Pregnancy {
   current_week?: number;
   trimester?: number;
   is_active: boolean;
+  provider_confirmed?: boolean;
+  provider_confirmed_at?: string;
   created_at: string;
   updated_at: string;
 }

@@ -4,6 +4,7 @@ from sqlalchemy import and_
 from app.database import get_db
 from app.models.user import User
 from app.models.subscription import SubscriptionPlan, UserSubscription, Payment
+from app.config import settings
 from app.api.v1.dependencies import get_current_user
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -499,4 +500,16 @@ async def get_payment_history(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch payment history"
         )
+
+
+@router.get("/bank-details")
+async def get_bank_details():
+    """Get bank account details for bank transfer payments"""
+    return {
+        "account_number": settings.BANK_ACCOUNT_NUMBER,
+        "account_name": settings.BANK_ACCOUNT_NAME,
+        "bank_name": settings.BANK_NAME,
+        "support_email": settings.BANK_SUPPORT_EMAIL,
+        "support_phone": settings.BANK_SUPPORT_PHONE,
+    }
 

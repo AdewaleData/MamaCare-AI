@@ -3,33 +3,72 @@ import logging
 from typing import Dict, List, Tuple
 from app.ml.model_loader import get_model_loader
 from app.schemas.prediction import PredictionRequest, PredictionResponse
+from app.services.guidelines_service import get_guidelines_service
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 
 class RiskPredictor:
-    """Handles risk prediction using trained ML model"""
-    
-    # Medical reference ranges for risk factor detection
-    NORMAL_RANGES = {
-        "systolic_bp": (90, 120),
-        "diastolic_bp": (60, 80),
-        "blood_sugar": (70, 100),
-        "body_temp": (36.5, 37.5),
-        "bmi": (18.5, 24.9),
-        "heart_rate": (60, 100),
-    }
-    
-    # Risk factor thresholds
-    RISK_THRESHOLDS = {
-        "high": 0.7,
-        "medium": 0.4,
-        "low": 0.0,
-    }
+    """Handles risk prediction using trained ML model with Nigerian clinical guidelines"""
     
     def __init__(self):
         self.model_loader = get_model_loader()
+        self.guidelines_service = get_guidelines_service()
+        
+        # Load normal ranges from Nigerian guidelines
+        normal_ranges = self.guidelines_service.get_normal_ranges()
+        bp_ranges = normal_ranges.get("blood_pressure", {})
+        sugar_ranges = normal_ranges.get("blood_sugar", {}).get("fasting", {})
+        bmi_ranges = normal_ranges.get("bmi", {})
+        hr_ranges = normal_ranges.get("heart_rate", {})
+        temp_ranges = normal_ranges.get("body_temperature", {})
+        
+        # Medical reference ranges from Nigerian guidelines
+        self.NORMAL_RANGES = {
+            "systolic_bp": (
+                bp_ranges.get("systolic", {}).get("normal_min", 90),
+                bp_ranges.get("systolic", {}).get("normal_max", 120)
+            ),
+            "diastolic_bp": (
+                bp_ranges.get("diastolic", {}).get("normal_min", 60),
+                bp_ranges.get("diastolic", {}).get("normal_max", 80)
+            ),
+            "blood_sugar": (
+                sugar_ranges.get("normal_min", 70),
+                sugar_ranges.get("normal_max", 100)
+            ),
+            "body_temp": (
+                temp_ranges.get("normal_min", 36.5),
+                temp_ranges.get("normal_max", 37.5)
+            ),
+            "bmi": (
+                bmi_ranges.get("normal_min", 18.5),
+                bmi_ranges.get("normal_max", 24.9)
+            ),
+            "heart_rate": (
+                hr_ranges.get("normal_min", 60),
+                hr_ranges.get("normal_max", 100)
+            ),
+        }
+        
+        # Risk thresholds from Nigerian guidelines
+        risk_thresholds = self.guidelines_service.get_risk_thresholds()
+        pregnancy_thresholds = risk_thresholds.get("pregnancy", {})
+        
+        # Extract thresholds (these are probability thresholds: 0.0-1.0)
+        high_min = pregnancy_thresholds.get("high_min", 0.70)  # 70% = High risk
+        medium_min = pregnancy_thresholds.get("medium_min", 0.40)  # 40% = Medium risk
+        low_max = pregnancy_thresholds.get("low_max", 0.40)  # <40% = Low risk
+        
+        self.RISK_THRESHOLDS = {
+            "high": high_min,      # >= 0.70 (70%)
+            "medium": medium_min,  # >= 0.40 and < 0.70 (40-69%)
+            "low": low_max,        # < 0.40 (0-39%)
+        }
+        
+        logger.info(f"Initialized RiskPredictor with Nigerian guidelines version {self.guidelines_service.get_version()}")
+        logger.info(f"Risk thresholds - High: >={high_min*100}%, Medium: {medium_min*100}%-{high_min*100}%, Low: <{low_max*100}%")
     
     def predict(self, request: PredictionRequest) -> PredictionResponse:
         """Make risk prediction for a patient - MUST use ML model"""
@@ -100,17 +139,20 @@ class RiskPredictor:
             raise RuntimeError(f"ML model prediction failed: {str(model_error)}")
         
         # CLASSIFY INTO 3-TIER SYSTEM: Low, Medium, High
-        # Based on P(High) from binary classification model:
-        # - Low: P(High) < 0.4 (model confident it's Low risk)
-        # - Medium: 0.4 <= P(High) < 0.7 (uncertain, moderate risk)
-        # - High: P(High) >= 0.7 (model confident it's High risk)
+        # Based on P(High) from binary classification model using Nigerian guidelines thresholds
+        # Thresholds from Nigerian clinical guidelines
+        low_max = self.RISK_THRESHOLDS.get("medium", 0.4) * 100
+        medium_max = self.RISK_THRESHOLDS.get("high", 0.7) * 100
+        
         risk_score_percentage = risk_score * 100
-        if risk_score_percentage < 40:
+        if risk_score_percentage < low_max:
             classified_risk_level = "Low"
-        elif risk_score_percentage < 70:
+        elif risk_score_percentage < medium_max:
             classified_risk_level = "Medium"
         else:
             classified_risk_level = "High"
+        
+        logger.info(f"Using Nigerian guidelines thresholds: Low<{low_max}%, Medium<{medium_max}%, High>={medium_max}%")
         
         logger.info(f"3-Tier Classification: P(High)={risk_score_percentage:.2f}% → {classified_risk_level} Risk")
         logger.info(f"Original binary prediction: {risk_level}, Classified: {classified_risk_level}")
@@ -247,32 +289,46 @@ class RiskPredictor:
         return features_array
     
     def _detect_risk_factors(self, request: PredictionRequest) -> List[str]:
-        """Detect individual risk factors based on medical thresholds"""
+        """Detect individual risk factors based on Nigerian clinical guidelines"""
         risk_factors = []
         
-        # Blood pressure check (handle None values)
+        # Blood pressure check using Nigerian guidelines
         systolic = request.systolic_bp or 120
         diastolic = request.diastolic_bp or 80
-        if systolic > 140 or diastolic > 90:
-            risk_factors.append("High Blood Pressure (Hypertension)")
+        bp_status, bp_details = self.guidelines_service.check_blood_pressure(systolic, diastolic)
+        if bp_status == "hypertension":
+            severity = bp_details.get("severity", "moderate")
+            if severity == "severe":
+                risk_factors.append("Severe Hypertension (BP ≥160/110 mmHg)")
+            else:
+                risk_factors.append("High Blood Pressure (Hypertension) - Nigerian Guidelines")
+        elif bp_status == "elevated":
+            risk_factors.append("Elevated Blood Pressure")
         
-        # Blood sugar check
+        # Blood sugar check using Nigerian guidelines
         blood_sugar = request.blood_sugar or 90.0
-        if blood_sugar > 126:
-            risk_factors.append("High Blood Sugar (Hyperglycemia)")
+        sugar_status, sugar_details = self.guidelines_service.check_blood_sugar(blood_sugar, is_fasting=True)
+        if sugar_status == "diabetes":
+            risk_factors.append("High Blood Sugar (Diabetes) - Nigerian Guidelines")
+        elif sugar_status == "prediabetes":
+            risk_factors.append("Elevated Blood Sugar (Prediabetes)")
         
-        # BMI check
+        # BMI check using Nigerian guidelines
         bmi = request.bmi or 25.0
-        if bmi > 30:
-            risk_factors.append("Obesity (BMI > 30)")
-        elif bmi < 18.5:
-            risk_factors.append("Underweight (BMI < 18.5)")
+        bmi_status, bmi_details = self.guidelines_service.check_bmi(bmi)
+        if bmi_status == "obese":
+            risk_factors.append("Obesity (BMI ≥30) - Nigerian Guidelines")
+        elif bmi_status == "overweight":
+            risk_factors.append("Overweight (BMI 25-29.9)")
+        elif bmi_status == "underweight":
+            risk_factors.append("Underweight (BMI <18.5)")
         
         # Heart rate check
         heart_rate = request.heart_rate or 75
-        if heart_rate > 100:
+        hr_ranges = self.NORMAL_RANGES.get("heart_rate", (60, 100))
+        if heart_rate > hr_ranges[1]:
             risk_factors.append("Elevated Heart Rate (Tachycardia)")
-        elif heart_rate < 60:
+        elif heart_rate < hr_ranges[0]:
             risk_factors.append("Low Heart Rate (Bradycardia)")
         
         # Medical history
@@ -352,40 +408,26 @@ class RiskPredictor:
         )
     
     def _generate_recommendations(self, risk_level: str, risk_factors: List[str]) -> List[str]:
-        """Generate clinical recommendations based on risk level and factors"""
+        """
+        Generate minimal clinical recommendations for risk assessment display.
+        NOTE: Detailed personalized recommendations (limited to 5) are generated
+        by the recommendations API endpoint, not here. This method only provides
+        brief summary recommendations for the risk assessment response.
+        """
         recommendations = []
         
-        risk_level_lower = risk_level.lower() if risk_level else "low"
+        # Only add 2-3 brief, critical recommendations based on actual risk factors
+        # The detailed recommendations API will provide the full personalized list (max 5)
         
-        if "high" in risk_level_lower:
-            recommendations.append("Immediate medical consultation required")
-            recommendations.append("Schedule urgent appointment with healthcare provider")
-            recommendations.append("Monitor vital signs daily")
-            recommendations.append("Consider hospitalization for close monitoring")
+        if any("Hypertension" in factor or "Blood Pressure" in factor for factor in risk_factors):
+            recommendations.append("Monitor blood pressure regularly and consult healthcare provider")
         
-        elif "medium" in risk_level_lower:
-            recommendations.append("Schedule appointment with healthcare provider within 1 week")
-            recommendations.append("Monitor vital signs regularly (2-3 times per week)")
-            recommendations.append("Maintain healthy diet and exercise routine")
-            recommendations.append("Reduce stress and get adequate rest")
+        if any("Blood Sugar" in factor or "Diabetes" in factor for factor in risk_factors):
+            recommendations.append("Monitor blood sugar and follow healthcare provider's dietary guidance")
         
-        else:  # Low risk
-            recommendations.append("Continue regular prenatal checkups")
-            recommendations.append("Maintain healthy lifestyle habits")
-            recommendations.append("Monitor vital signs weekly")
-            recommendations.append("Report any unusual symptoms immediately")
+        if "Obesity" in str(risk_factors) or "Overweight" in str(risk_factors):
+            recommendations.append("Consult healthcare provider about safe weight management")
         
-        # Add specific recommendations based on risk factors
-        if "High Blood Pressure" in risk_factors:
-            recommendations.append("Reduce sodium intake and manage stress")
-        
-        if "High Blood Sugar" in risk_factors:
-            recommendations.append("Monitor carbohydrate intake and consult nutritionist")
-        
-        if "Obesity" in risk_factors:
-            recommendations.append("Consult with healthcare provider about safe exercise")
-        
-        if "Preexisting Diabetes" in risk_factors or "Gestational Diabetes" in risk_factors:
-            recommendations.append("Regular blood sugar monitoring and insulin management")
-        
-        return recommendations
+        # Limit to 3 brief recommendations for risk assessment display
+        # Full personalized recommendations (max 5) are available via /recommendations endpoint
+        return recommendations[:3]
