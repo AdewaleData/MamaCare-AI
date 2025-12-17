@@ -114,6 +114,7 @@ function PublicRoute({ children, allowAuthenticated = false }: { children: React
 }
 
 function App() {
+  // Note: This comment is a no-op change to surface a new commit and does not affect application behavior.
   return (
     <BrowserRouter>
       <Routes>

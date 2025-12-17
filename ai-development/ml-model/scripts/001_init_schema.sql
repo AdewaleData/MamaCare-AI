@@ -1,4 +1,5 @@
 -- Create users table
+-- Note: This line is a documentation-only comment added to trigger a new Git commit; it does not change the schema.
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   first_name VARCHAR(100) NOT NULL,
