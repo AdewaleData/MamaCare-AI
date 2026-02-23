@@ -114,6 +114,6 @@ To work with or extend the machine learning models:
 - **Oguntola Adewale** — Lead  
 - **Abdulqoyum Olowookere**  
 - **Oyeniran Fateemah**  
-- **Akinteye Roheem**
+-
 
 

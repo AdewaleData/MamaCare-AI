@@ -13,7 +13,7 @@ class EmergencyAlert(Base):
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     pregnancy_id = Column(String(36), ForeignKey("pregnancies.id", ondelete="SET NULL"), nullable=True)
     
-    # Location data
+    # Location 
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     address = Column(String(500), nullable=True)
