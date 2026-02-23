@@ -1,1 +1,1 @@
-  "build": "npx vite build",
+{\n  \"name\": \"mamacare-ai\",\n  \"version\": \"1.0.0\",\n  \"scripts\": {\n    \"start\": \"npx vite\",\n    \"build\": \"npx vite build\",\n    \"test\": \"vitest\"\n  },\n  \"dependencies\": {\n    \"vue\": \"^3.2.31\",\n    \"vue-router\": \"^4.0.12\",\n    \"axios\": \"^0.24.0\",\n    \"pinia\": \"^2.0.0-rc.8\"\n  },\n  \"devDependencies\": {\n    \"vite\": \"^2.6.14\",\n    \"@vitejs/plugin-vue\": \"^2.1.0\",\n    \"vitest\": \"^0.7.10\"\n  }\n}
