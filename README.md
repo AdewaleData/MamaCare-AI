@@ -10,13 +10,13 @@ It combines a modern web app (React + TypeScript), a robust API (FastAPI + SQLAl
 
 The goal of MamaCare AI is to move from *reactive* to *proactive* maternal care: identifying risk early, triggering timely interventions, and giving every mother an intelligent “digital co-pilot” during pregnancy.
 
-### Why This Project Matters (Hackathon Angle)
+### Why This Project Matters 
 
 - **High-impact problem**: Maternal mortality in many African countries is still unacceptably high, often due to late detection of complications and poor follow-up.  
 - **Practical, deployable solution**: MamaCare AI is designed to run on low-cost infrastructure, with offline-friendly flows and SMS support.  
 - **End-to-end system**: Not just a model — it includes **ML + backend API + frontend dashboards + IoT device firmware**, ready to be piloted in real-world clinics.
 
-## Core Features (What Judges Should Notice)
+## Core Features 
 
 - **AI Risk Assessment**
   - **Predictive models** trained on maternal health data (Gradient Boosting, specialized predictors)
@@ -76,7 +76,7 @@ npm run dev
 The frontend will start with Vite (commonly on `http://localhost:5173`).  
 Make sure the backend is running so the app can reach the API.
 
-### 5. AI Development (Optional – For ML Track / Research)
+### 5. AI Development
 To work with or extend the machine learning models:
 
 1. Open the notebook:  
@@ -87,7 +87,7 @@ To work with or extend the machine learning models:
    - Retrain or fine-tune models  
    - Export updated `.pkl` model files into the `models` folder used by the backend
 
-## Tech Stack (At a Glance)
+## Tech Stack 
 
 - **Frontend**
   - **React 18 + TypeScript**
