@@ -1,1 +1,1 @@
-{"name": "mama-care-ai","version": "1.0.0","scripts": {"build": "vite build"},"dependencies": {},"devDependencies": {}}
+  "build": "npx vite build",
