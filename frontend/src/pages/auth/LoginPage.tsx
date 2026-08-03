@@ -27,7 +27,7 @@ export default function LoginPage() {
         if (data.user) {
           setAuth(data.user, data.access_token);
           console.log('Auth set successfully');
-          
+
           // Navigate immediately - no delays needed
           const role = data.user.role || 'patient';
           let targetPath = '/dashboard';
@@ -36,7 +36,7 @@ export default function LoginPage() {
           } else if (role === 'government') {
             targetPath = '/government-dashboard';
           }
-          
+
           console.log('Navigating to:', targetPath);
           // Use window.location for immediate navigation to avoid React Router issues
           window.location.href = targetPath;
@@ -99,7 +99,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center relative px-4 py-12">
       {/* Background Image */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: 'url(/pregnant_women.jpg)',
@@ -108,14 +108,12 @@ export default function LoginPage() {
         {/* Animated gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary-900/90 via-primary-800/85 to-primary-900/90"></div>
       </div>
-      
+
       <div className="max-w-md w-full relative z-10 fade-in scale-in">
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <div className="glass-card p-5 rounded-3xl shadow-2xl border-2 border-white/30 transform hover:scale-110 hover:rotate-6 transition-all duration-300 float">
-              <img src="/logo.png" alt="MamaCare AI Logo" className="h-16 w-16 object-contain" />
-            </div>
+            <img src="/logo.png" alt="MamaCare AI Logo" className="h-28 w-28 object-contain drop-shadow-lg" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-3 drop-shadow-2xl text-gradient-animated">Welcome to MamaCare AI</h1>
           <p className="text-lg text-white/95 drop-shadow-lg">

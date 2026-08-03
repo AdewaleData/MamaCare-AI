@@ -48,7 +48,7 @@ export default function RegisterPage() {
         });
         const user = await authApi.getCurrentUser();
         setAuth(user, loginData.access_token);
-        
+
         // Navigate to appropriate dashboard based on role
         if (user.role === 'provider') {
           navigate('/app/provider-dashboard');
@@ -224,7 +224,7 @@ export default function RegisterPage() {
     // If no errors, submit the form
     if (Object.keys(allErrors).length === 0) {
       const { confirmPassword, contact_person_name, department_unit, latitude, longitude, ...submitData } = formData;
-      
+
       // For government, use contact_person_name as full_name and append department to organization_name
       if (formData.role === 'government') {
         submitData.full_name = contact_person_name;
@@ -233,7 +233,7 @@ export default function RegisterPage() {
           submitData.organization_name = `${submitData.organization_name} - ${department_unit}`;
         }
       }
-      
+
       registerMutation.mutate({
         ...submitData,
         age: submitData.age ? Number(submitData.age) : undefined,
@@ -257,7 +257,7 @@ export default function RegisterPage() {
     const passwordsMatch = formData.password === formData.confirmPassword;
     const passwordLength = formData.password.length >= 8;
     const noErrors = Object.keys(errors).length === 0;
-    
+
     const baseValid = hasEmail && hasPassword && passwordsMatch && passwordLength && noErrors;
 
     // Role-specific validation
@@ -279,9 +279,7 @@ export default function RegisterPage() {
       <div className="max-w-2xl w-full fade-in scale-in">
         <div className="text-center mb-8 md:mb-10">
           <div className="flex justify-center mb-6">
-            <div className="bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 p-6 rounded-3xl shadow-2xl transform hover:scale-110 hover:rotate-6 transition-all duration-300 float">
-              <img src="/logo.png" alt="MamaCare AI Logo" className="h-20 w-20 object-contain" />
-            </div>
+            <img src="/logo.png" alt="MamaCare AI Logo" className="h-32 w-32 object-contain drop-shadow-lg" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3 text-gradient">Create Your Account</h1>
           <p className="text-lg md:text-xl text-gray-600">Start your journey with MamaCare AI</p>
@@ -307,11 +305,10 @@ export default function RegisterPage() {
                     setFormData({ ...formData, role: 'patient', license_number: '', organization_name: '', contact_person_name: '', department_unit: '' });
                     setErrors({ ...errors, license_number: '', organization_name: '', contact_person_name: '', department_unit: '' });
                   }}
-                  className={`p-5 md:p-6 border-2 rounded-xl transition-all transform hover:scale-105 ${
-                    formData.role === 'patient'
-                      ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-primary-100 text-primary-700 shadow-lg'
-                      : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50 bg-white'
-                  }`}
+                  className={`p-5 md:p-6 border-2 rounded-xl transition-all transform hover:scale-105 ${formData.role === 'patient'
+                    ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-primary-100 text-primary-700 shadow-lg'
+                    : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50 bg-white'
+                    }`}
                 >
                   <User className={`h-8 w-8 mx-auto mb-3 ${formData.role === 'patient' ? 'text-primary-600' : 'text-gray-400'}`} />
                   <div className="font-semibold text-sm md:text-base">Patient</div>
@@ -323,11 +320,10 @@ export default function RegisterPage() {
                     setFormData({ ...formData, role: 'provider', contact_person_name: '', department_unit: '' });
                     setErrors({ ...errors, license_number: '', organization_name: '', contact_person_name: '', department_unit: '' });
                   }}
-                  className={`p-5 md:p-6 border-2 rounded-xl transition-all transform hover:scale-105 ${
-                    formData.role === 'provider'
-                      ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-primary-100 text-primary-700 shadow-lg'
-                      : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50 bg-white'
-                  }`}
+                  className={`p-5 md:p-6 border-2 rounded-xl transition-all transform hover:scale-105 ${formData.role === 'provider'
+                    ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-primary-100 text-primary-700 shadow-lg'
+                    : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50 bg-white'
+                    }`}
                 >
                   <Stethoscope className={`h-8 w-8 mx-auto mb-3 ${formData.role === 'provider' ? 'text-primary-600' : 'text-gray-400'}`} />
                   <div className="font-semibold text-sm md:text-base">Doctor</div>
@@ -339,11 +335,10 @@ export default function RegisterPage() {
                     setFormData({ ...formData, role: 'government', license_number: '', full_name: '', age: '' });
                     setErrors({ ...errors, license_number: '', organization_name: '', contact_person_name: '', department_unit: '' });
                   }}
-                  className={`p-5 md:p-6 border-2 rounded-xl transition-all transform hover:scale-105 ${
-                    formData.role === 'government'
-                      ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-primary-100 text-primary-700 shadow-lg'
-                      : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50 bg-white'
-                  }`}
+                  className={`p-5 md:p-6 border-2 rounded-xl transition-all transform hover:scale-105 ${formData.role === 'government'
+                    ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-primary-100 text-primary-700 shadow-lg'
+                    : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50 bg-white'
+                    }`}
                 >
                   <Building2 className={`h-8 w-8 mx-auto mb-3 ${formData.role === 'government' ? 'text-primary-600' : 'text-gray-400'}`} />
                   <div className="font-semibold text-sm md:text-base">Government</div>
@@ -444,7 +439,7 @@ export default function RegisterPage() {
                     <p className="text-sm text-gray-600 mb-4">
                       Add your location to help find nearby healthcare providers
                     </p>
-                    
+
                     <div className="mb-4">
                       <label htmlFor="address_patient" className="block text-sm font-semibold text-gray-700 mb-2">
                         Address
@@ -658,7 +653,7 @@ export default function RegisterPage() {
                       Please provide your professional credentials for account verification
                     </p>
                   </div>
-                  
+
                   <div className="mb-6">
                     <label htmlFor="license_number" className="block text-sm font-semibold text-gray-700 mb-2">
                       Medical License Number <span className="text-danger-500">*</span>
@@ -755,7 +750,7 @@ export default function RegisterPage() {
                     <p className="text-sm text-gray-600 mb-4">
                       Add your practice location to help patients find you nearby
                     </p>
-                    
+
                     <div className="mb-4">
                       <label htmlFor="address" className="block text-sm font-semibold text-gray-700 mb-2">
                         Address
@@ -1018,10 +1013,10 @@ export default function RegisterPage() {
                 )}
               </button>
               {/* Debug info - remove in production */}
-              {process.env.NODE_ENV === 'development' && (
+              {import.meta.env.DEV && (
                 <div className="mt-2 text-xs text-gray-500">
-                  Form valid: {isFormValid() ? 'Yes' : 'No'} | 
-                  Errors: {Object.keys(errors).length} | 
+                  Form valid: {isFormValid() ? 'Yes' : 'No'} |
+                  Errors: {Object.keys(errors).length} |
                   Role: {formData.role}
                 </div>
               )}
