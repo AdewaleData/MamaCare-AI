@@ -18,6 +18,15 @@ export interface UserCreate {
   language_preference: string;
   role: string;
   password: string;
+  license_number?: string;
+  organization_name?: string;
+  id_document_url?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface UserLogin {
@@ -106,11 +115,13 @@ export interface HealthRecordHistory {
 }
 
 export interface RiskAssessment {
+  id?: string;
   overall_risk: string;
   risk_level?: string; // Alias for overall_risk
   risk_score: number;
   recommendations: string[];
   risk_factors?: string[];
+  assessed_at?: string;
   specialized_assessments?: {
     preeclampsia?: {
       risk: string;

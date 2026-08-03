@@ -1,6 +1,7 @@
 from app.api.v1 import auth, health, predictions, appointments, emergency, pregnancy, recommendations, websocket, statistics, dashboards, hospitals, offline, translations, subscriptions, voice, chat, providers
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 import logging
 from contextlib import asynccontextmanager
@@ -39,7 +40,7 @@ _ = message.Message  # Force Message model to resolve relationships
 # Now import API routers (after models are loaded)
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))
 logger = logging.getLogger(__name__)
 
 
@@ -49,6 +50,7 @@ async def lifespan(app: FastAPI):
     logger.info("=" * 60)
     logger.info("Starting MamaCare AI Backend")
     logger.info("=" * 60)
+    settings.validate_production()
 
     # Initialize database
     init_db()
@@ -84,6 +86,7 @@ app = FastAPI(
 
 # Middleware
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -127,7 +130,12 @@ app.include_router(websocket.router, tags=["WebSocket"])
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "service": "MamaCare AI"}
+    return {
+        "status": "healthy",
+        "service": "MamaCare AI",
+        "environment": settings.ENVIRONMENT,
+        "model_ready": get_model_loader().is_ready(),
+    }
 
 
 @app.get("/")

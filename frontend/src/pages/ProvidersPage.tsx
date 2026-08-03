@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { providersApi, Provider, ProviderSearchParams } from '../services/api';
+import { providersApi } from '../services/api';
 import { Search, Stethoscope, Building2, Mail, Phone, CheckCircle, Loader2, User, MapPin, Navigation } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import type { Provider, ProviderSearchParams } from '../services/api';
 
 export default function ProvidersPage() {
   const { user } = useAuthStore();
@@ -23,19 +24,23 @@ export default function ProvidersPage() {
     sort_by: sortBy,
   };
 
-  const { data: providers = [], isLoading, error } = useQuery({
+  const { data: providers = [], isLoading, error } = useQuery<Provider[]>({
     queryKey: ['providers', searchQuery, organizationFilter, userLocation, useLocation, radiusKm, sortBy],
     queryFn: () => {
       console.log('[ProvidersPage] Fetching providers with params:', searchParams);
       return providersApi.list(searchParams);
     },
-    onError: (err) => {
-      console.error('[ProvidersPage] Error fetching providers:', err);
-    },
-    onSuccess: (data) => {
-      console.log('[ProvidersPage] Received providers:', data?.length || 0, data);
-    },
   });
+
+  useEffect(() => {
+    if (error) {
+      console.error('[ProvidersPage] Error fetching providers:', error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    console.log('[ProvidersPage] Received providers:', providers.length, providers);
+  }, [providers]);
 
   // Get unique organizations for filter
   const organizations = Array.from(
@@ -187,7 +192,7 @@ export default function ProvidersPage() {
               ? 'Try adjusting your search criteria'
               : 'No providers available at the moment. Providers will appear here once they register.'}
           </p>
-          {process.env.NODE_ENV === 'development' && (
+          {import.meta.env.DEV && (
             <p className="mt-2 text-xs text-gray-500">
               Debug: verified_only={searchParams.verified_only?.toString()}, 
               search={searchQuery || 'none'}, 

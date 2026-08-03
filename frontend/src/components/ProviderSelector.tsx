@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { providersApi, Provider } from '../services/api';
+import { providersApi } from '../services/api';
 import { Search, Stethoscope, Building2, Check, Loader2, X } from 'lucide-react';
+import type { Provider } from '../services/api';
 
 interface ProviderSelectorProps {
   value?: string; // Selected provider name
@@ -21,9 +22,12 @@ export default function ProviderSelector({
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
 
   // Fetch providers
-  const { data: providers = [], isLoading } = useQuery({
+  const { data: providers = [], isLoading } = useQuery<Provider[]>({
     queryKey: ['providers', searchQuery],
-    queryFn: () => providersApi.list(searchQuery, undefined, true),
+    queryFn: () => providersApi.list({
+      search: searchQuery || undefined,
+      verified_only: true,
+    }),
     enabled: isOpen,
   });
 

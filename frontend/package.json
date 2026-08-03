@@ -1,1 +1,39 @@
-{\n  \"name\": \"mamacare-ai\",\n  \"version\": \"1.0.0\",\n  \"scripts\": {\n    \"start\": \"npx vite\",\n    \"build\": \"npx vite build\",\n    \"test\": \"vitest\"\n  },\n  \"dependencies\": {\n    \"vue\": \"^3.2.31\",\n    \"vue-router\": \"^4.0.12\",\n    \"axios\": \"^0.24.0\",\n    \"pinia\": \"^2.0.0-rc.8\"\n  },\n  \"devDependencies\": {\n    \"vite\": \"^2.6.14\",\n    \"@vitejs/plugin-vue\": \"^2.1.0\",\n    \"vitest\": \"^0.7.10\"\n  }\n}
+{
+  "name": "mamacare-ai",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "axios": "^1.6.0",
+    "date-fns": "^2.30.0",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.454.0",
+    "lucide-react": "^0.542.0",
+    "plotly.js": "^2.27.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-leaflet": "^4.2.1",
+    "react-plotly.js": "^2.6.0",
+    "react-router-dom": "^6.20.0",
+    "recharts": "^2.10.0",
+    "zustand": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.21",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  }
+}

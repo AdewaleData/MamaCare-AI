@@ -18,7 +18,9 @@ export default function RiskAssessmentHistoryPage() {
   });
 
   // Extract assessments array from response (backend returns {assessments: [...], total: ...})
-  const history = historyResponse?.assessments || (Array.isArray(historyResponse) ? historyResponse : []);
+  const history: RiskAssessment[] = Array.isArray(historyResponse)
+    ? historyResponse
+    : historyResponse?.assessments || [];
 
   const getRiskColor = (riskLevel: string) => {
     const level = riskLevel?.toLowerCase() || '';

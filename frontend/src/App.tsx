@@ -60,7 +60,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   // Wait for initial check - show loading instead of blank
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-primary-50/30">
+      <div className="page-shell flex min-h-screen items-center justify-center">
         <div className="text-center fade-in">
           <div className="relative">
             <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary-200 border-r-primary-600"></div>
@@ -114,7 +114,6 @@ function PublicRoute({ children, allowAuthenticated = false }: { children: React
 }
 
 function App() {
-  // Note: This comment is a no-op change to surface a new commit and does not affect application behavior.
   return (
     <BrowserRouter>
       <Routes>

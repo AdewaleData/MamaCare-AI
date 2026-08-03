@@ -1,0 +1,149 @@
+    0: \x80 PROTO      4
+    2: \x95 FRAME      712
+   11: \x8c SHORT_BINUNICODE 'sklearn.ensemble._gb'
+   33: \x94 MEMOIZE    (as 0)
+   34: \x8c SHORT_BINUNICODE 'GradientBoostingClassifier'
+   62: \x94 MEMOIZE    (as 1)
+   63: \x93 STACK_GLOBAL
+   64: \x94 MEMOIZE    (as 2)
+   65: )    EMPTY_TUPLE
+   66: \x81 NEWOBJ
+   67: \x94 MEMOIZE    (as 3)
+   68: }    EMPTY_DICT
+   69: \x94 MEMOIZE    (as 4)
+   70: (    MARK
+   71: \x8c     SHORT_BINUNICODE 'n_estimators'
+   85: \x94     MEMOIZE    (as 5)
+   86: K        BININT1    100
+   88: \x8c     SHORT_BINUNICODE 'learning_rate'
+  103: \x94     MEMOIZE    (as 6)
+  104: G        BINFLOAT   0.2
+  113: \x8c     SHORT_BINUNICODE 'loss'
+  119: \x94     MEMOIZE    (as 7)
+  120: \x8c     SHORT_BINUNICODE 'log_loss'
+  130: \x94     MEMOIZE    (as 8)
+  131: \x8c     SHORT_BINUNICODE 'criterion'
+  142: \x94     MEMOIZE    (as 9)
+  143: \x8c     SHORT_BINUNICODE 'friedman_mse'
+  157: \x94     MEMOIZE    (as 10)
+  158: \x8c     SHORT_BINUNICODE 'min_samples_split'
+  177: \x94     MEMOIZE    (as 11)
+  178: K        BININT1    2
+  180: \x8c     SHORT_BINUNICODE 'min_samples_leaf'
+  198: \x94     MEMOIZE    (as 12)
+  199: K        BININT1    1
+  201: \x8c     SHORT_BINUNICODE 'min_weight_fraction_leaf'
+  227: \x94     MEMOIZE    (as 13)
+  228: G        BINFLOAT   0.0
+  237: \x8c     SHORT_BINUNICODE 'subsample'
+  248: \x94     MEMOIZE    (as 14)
+  249: G        BINFLOAT   1.0
+  258: \x8c     SHORT_BINUNICODE 'max_features'
+  272: \x94     MEMOIZE    (as 15)
+  273: N        NONE
+  274: \x8c     SHORT_BINUNICODE 'max_depth'
+  285: \x94     MEMOIZE    (as 16)
+  286: K        BININT1    3
+  288: \x8c     SHORT_BINUNICODE 'min_impurity_decrease'
+  311: \x94     MEMOIZE    (as 17)
+  312: G        BINFLOAT   0.0
+  321: \x8c     SHORT_BINUNICODE 'ccp_alpha'
+  332: \x94     MEMOIZE    (as 18)
+  333: G        BINFLOAT   0.0
+  342: \x8c     SHORT_BINUNICODE 'init'
+  348: \x94     MEMOIZE    (as 19)
+  349: N        NONE
+  350: \x8c     SHORT_BINUNICODE 'random_state'
+  364: \x94     MEMOIZE    (as 20)
+  365: K        BININT1    42
+  367: \x8c     SHORT_BINUNICODE 'alpha'
+  374: \x94     MEMOIZE    (as 21)
+  375: G        BINFLOAT   0.9
+  384: \x8c     SHORT_BINUNICODE 'verbose'
+  393: \x94     MEMOIZE    (as 22)
+  394: K        BININT1    0
+  396: \x8c     SHORT_BINUNICODE 'max_leaf_nodes'
+  412: \x94     MEMOIZE    (as 23)
+  413: N        NONE
+  414: \x8c     SHORT_BINUNICODE 'warm_start'
+  426: \x94     MEMOIZE    (as 24)
+  427: \x89     NEWFALSE
+  428: \x8c     SHORT_BINUNICODE 'validation_fraction'
+  449: \x94     MEMOIZE    (as 25)
+  450: G        BINFLOAT   0.1
+  459: \x8c     SHORT_BINUNICODE 'n_iter_no_change'
+  477: \x94     MEMOIZE    (as 26)
+  478: N        NONE
+  479: \x8c     SHORT_BINUNICODE 'tol'
+  484: \x94     MEMOIZE    (as 27)
+  485: G        BINFLOAT   0.0001
+  494: \x8c     SHORT_BINUNICODE 'feature_names_in_'
+  513: \x94     MEMOIZE    (as 28)
+  514: \x8c     SHORT_BINUNICODE 'joblib.numpy_pickle'
+  535: \x94     MEMOIZE    (as 29)
+  536: \x8c     SHORT_BINUNICODE 'NumpyArrayWrapper'
+  555: \x94     MEMOIZE    (as 30)
+  556: \x93     STACK_GLOBAL
+  557: \x94     MEMOIZE    (as 31)
+  558: )        EMPTY_TUPLE
+  559: \x81     NEWOBJ
+  560: \x94     MEMOIZE    (as 32)
+  561: }        EMPTY_DICT
+  562: \x94     MEMOIZE    (as 33)
+  563: (        MARK
+  564: \x8c         SHORT_BINUNICODE 'subclass'
+  574: \x94         MEMOIZE    (as 34)
+  575: \x8c         SHORT_BINUNICODE 'numpy'
+  582: \x94         MEMOIZE    (as 35)
+  583: \x8c         SHORT_BINUNICODE 'ndarray'
+  592: \x94         MEMOIZE    (as 36)
+  593: \x93         STACK_GLOBAL
+  594: \x94         MEMOIZE    (as 37)
+  595: \x8c         SHORT_BINUNICODE 'shape'
+  602: \x94         MEMOIZE    (as 38)
+  603: K            BININT1    20
+  605: \x85         TUPLE1
+  606: \x94         MEMOIZE    (as 39)
+  607: \x8c         SHORT_BINUNICODE 'order'
+  614: \x94         MEMOIZE    (as 40)
+  615: \x8c         SHORT_BINUNICODE 'C'
+  618: \x94         MEMOIZE    (as 41)
+  619: \x8c         SHORT_BINUNICODE 'dtype'
+  626: \x94         MEMOIZE    (as 42)
+  627: h            BINGET     35
+  629: \x8c         SHORT_BINUNICODE 'dtype'
+  636: \x94         MEMOIZE    (as 43)
+  637: \x93         STACK_GLOBAL
+  638: \x94         MEMOIZE    (as 44)
+  639: \x8c         SHORT_BINUNICODE 'O8'
+  643: \x94         MEMOIZE    (as 45)
+  644: \x89         NEWFALSE
+  645: \x88         NEWTRUE
+  646: \x87         TUPLE3
+  647: \x94         MEMOIZE    (as 46)
+  648: R            REDUCE
+  649: \x94         MEMOIZE    (as 47)
+  650: (            MARK
+  651: K                BININT1    3
+  653: \x8c             SHORT_BINUNICODE '|'
+  656: \x94             MEMOIZE    (as 48)
+  657: N                NONE
+  658: N                NONE
+  659: N                NONE
+  660: J                BININT     -1
+  665: J                BININT     -1
+  670: K                BININT1    63
+  672: t                TUPLE      (MARK at 650)
+  673: \x94         MEMOIZE    (as 49)
+  674: b            BUILD
+  675: \x8c         SHORT_BINUNICODE 'allow_mmap'
+  687: \x94         MEMOIZE    (as 50)
+  688: \x89         NEWFALSE
+  689: \x8c         SHORT_BINUNICODE 'numpy_array_alignment_bytes'
+  718: \x94         MEMOIZE    (as 51)
+  719: K            BININT1    16
+  721: u            SETITEMS   (MARK at 563)
+  722: b        BUILD
+  723: \x80     PROTO      2
+  725: c        GLOBAL     'numpy.core.multiarray _reconstruct'
+  761: q        BINPUT     0

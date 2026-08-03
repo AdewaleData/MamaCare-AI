@@ -6,7 +6,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
-import { Volume2, VolumeX, Loader2, X, Minimize2, Maximize2, Settings, HelpCircle } from 'lucide-react';
+import { Volume2, Loader2, X, Minimize2, Settings, HelpCircle } from 'lucide-react';
 import { useTranslation } from '../contexts/TranslationContext';
 import { voiceApi } from '../services/api';
 import { selectVoiceForLanguage, getVoiceAvailabilityMessage, useCloudTTS } from '../utils/voiceSelection';
@@ -75,6 +75,12 @@ export default function UniversalVoiceAssistant({
   useEffect(() => {
     console.log('[Voice Assistant] Current path:', location.pathname, '→ Page type:', pageType);
   }, [location.pathname, pageType]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsMinimized(true);
+    }
+  }, []);
 
   // Fetch summary from backend with page type
   const { data: summaryData, isLoading, error, refetch } = useQuery({
@@ -321,7 +327,7 @@ export default function UniversalVoiceAssistant({
       <div className={`fixed bottom-4 right-4 z-50 ${className}`}>
         <button
           onClick={() => setIsMinimized(false)}
-          className="flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-110"
+          className="flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
           title={t('voice_assistant', 'Voice Assistant')}
         >
           <Volume2 className="h-6 w-6" />
@@ -331,7 +337,7 @@ export default function UniversalVoiceAssistant({
   }
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 ${className}`}>
+    <div className={`fixed bottom-4 right-4 left-4 sm:left-auto z-50 w-auto sm:w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100">
         <div className="flex items-center space-x-2">

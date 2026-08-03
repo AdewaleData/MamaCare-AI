@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../store/authStore';
 import { authApi } from '../services/api';
 import { User, Mail, Phone, Calendar, Globe, Save, Loader2, Lock, Eye, EyeOff } from 'lucide-react';
+import type { User as UserType } from '../types';
 
 export default function ProfilePage() {
   const { user, setAuth } = useAuthStore();
@@ -23,17 +24,20 @@ export default function ProfilePage() {
     confirm_password: '',
   });
 
-  const { data: currentUser } = useQuery({
+  const { data: currentUser } = useQuery<UserType>({
     queryKey: ['current-user'],
     queryFn: authApi.getCurrentUser,
-    onSuccess: (data) => {
-      setFormData({
-        full_name: data.full_name,
-        phone: data.phone || '',
-        language_preference: data.language_preference,
-      });
-    },
   });
+
+  useEffect(() => {
+    if (currentUser) {
+      setFormData({
+        full_name: currentUser.full_name,
+        phone: currentUser.phone || '',
+        language_preference: currentUser.language_preference,
+      });
+    }
+  }, [currentUser]);
 
   const updateMutation = useMutation({
     mutationFn: authApi.updateUser,

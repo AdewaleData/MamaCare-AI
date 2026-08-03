@@ -1,0 +1,83 @@
+# ============================================================================
+# SAVE MODELS (CLEAN & FIXED VERSION)
+# ============================================================================
+import os
+import joblib
+from datetime import datetime
+
+print("\n" + "="*80)
+print("SAVING MODELS")
+print("="*80)
+
+# Ensure models and data directories exist
+os.makedirs('models', exist_ok=True)
+os.makedirs('data/processed', exist_ok=True)
+
+# ----------------------------------------------------------------------------
+# 1️⃣ Save Scaler
+# ----------------------------------------------------------------------------
+scaler_filename = 'models/scaler_hackathon.pkl'
+joblib.dump(scaler, scaler_filename)
+print(f"✅ Saved: {scaler_filename}")
+
+# ----------------------------------------------------------------------------
+# 2️⃣ Save Label Encoder
+# ----------------------------------------------------------------------------
+encoder_filename = 'models/label_encoder_hackathon.pkl'
+joblib.dump(label_encoder, encoder_filename)
+print(f"✅ Saved: {encoder_filename}")
+
+# ----------------------------------------------------------------------------
+# 3️⃣ Save Feature Names
+# ----------------------------------------------------------------------------
+feature_filename = 'models/feature_names_hackathon.pkl'
+joblib.dump(feature_columns, feature_filename)
+print(f"✅ Saved: {feature_filename}")
+
+# ----------------------------------------------------------------------------
+# 4️⃣ Save All Models (Dictionary of Models)
+# ----------------------------------------------------------------------------
+models_filename = 'models/models_hackathon.pkl'
+joblib.dump(models, models_filename)
+print(f"✅ Saved: {models_filename}")
+
+# ----------------------------------------------------------------------------
+# 5️⃣ Save Metadata (Model Summary)
+# ----------------------------------------------------------------------------
+metadata = {
+    'model_name': best_model_name,
+    'model_type': type(best_tuned_model).__name__,
+    'best_params': grid_search.best_params_,
+    'test_accuracy': tuned_accuracy,
+    'test_f1_score': tuned_f1,
+    'feature_count': len(feature_columns),
+    'training_samples': X_train.shape[0],
+    'test_samples': X_test.shape[0],
+    'classes': label_encoder.classes_.tolist(),
+    'trained_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+}
+metadata_filename = 'models/model_metadata_hackathon.pkl'
+joblib.dump(metadata, metadata_filename)
+print(f"✅ Saved: {metadata_filename}")
+
+# ----------------------------------------------------------------------------
+# 6️⃣ Save the Best Actual Trained Model
+# ----------------------------------------------------------------------------
+model_filename = f'models/best_model_hackathon_{best_model_name.lower().replace(" ", "_")}.pkl'
+joblib.dump(best_tuned_model, model_filename)
+print(f"✅ Saved: {model_filename}")
+
+# Confirm path & existence
+print(f"📁 Absolute Path: {os.path.abspath(model_filename)}")
+print(f"🧩 File Exists: {os.path.exists(model_filename)}")
+
+# ----------------------------------------------------------------------------
+# 7️⃣ Save Processed Data (Optional)
+# ----------------------------------------------------------------------------
+processed_data_filename = 'data/processed/processed_data_hackathon.csv'
+df.to_csv(processed_data_filename, index=False)
+print(f"✅ Saved: {processed_data_filename}")
+
+print("\n" + "="*80)
+print("🎉 All models and artifacts saved successfully!")
+print("="*80)

@@ -1,120 +1,156 @@
-from pydantic_settings import BaseSettings
-from typing import List
 import os
 from pathlib import Path
+from typing import List
+
 from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
 
-# load from AI-development ml-model .env files if exists (for Twilio credentials only)
-# Check multiple possible locations
-_ai_dev_env_paths = [
-    os.path.join(os.path.dirname(__file__),
-                 "../../ai-development/ml-model/.env"),
-    os.path.join(os.path.dirname(__file__),
-                 "../../ai-development/ml-model/.env.local"),
-    os.path.join(os.path.dirname(__file__),
-                 "../../ai-development/ml-model/mamacare_backend/.env"),
-]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+BACKEND_ROOT = PROJECT_ROOT / "backend"
+MODEL_ROOT = PROJECT_ROOT / "ai-development" / "ml-model" / "models"
+DEFAULT_SECRET_KEY = "change-me-in-production"
 
-# Load only Twilio-related variables, not DATABASE_URL
-for env_path in _ai_dev_env_paths:
-    if os.path.exists(env_path):
-        # Load environment variables
-        env_vars = {}
-        with open(env_path, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith('#') and '=' in line:
-                    key, value = line.split('=', 1)
-                    # Only load Twilio variables, ignore DATABASE_URL and others
-                    if key.startswith('TWILIO'):
-                        env_vars[key] = value
 
-        # Set only Twilio variables
-        for key, value in env_vars.items():
-            if key not in os.environ:  # Don't override existing values
-                os.environ[key] = value
+def _parse_csv_env(value: str | None, fallback: List[str]) -> List[str]:
+    if not value:
+        return fallback
 
-        print(f"[Config] Loaded Twilio credentials from: {env_path}")
-        break
+    parsed = [item.strip() for item in value.split(",") if item.strip()]
+    return parsed or fallback
+
+
+def _load_optional_ml_env() -> None:
+    env_candidates = [
+        PROJECT_ROOT / "ai-development" / "ml-model" / ".env",
+        PROJECT_ROOT / "ai-development" / "ml-model" / ".env.local",
+        PROJECT_ROOT / "ai-development" / "ml-model" / "mamacare_backend" / ".env",
+    ]
+
+    for env_path in env_candidates:
+        if env_path.exists():
+            load_dotenv(env_path, override=False)
+            break
+
+
+def _resolve_default_model_path() -> str:
+    candidates = [
+        MODEL_ROOT / "best_model_hackathon_gradient_boosting.pkl",
+        MODEL_ROOT / "best_model_hachathon_gradient_boosting.pkl",
+        MODEL_ROOT / "model_hackathon.pkl",
+    ]
+
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+
+    return str(candidates[-1])
+
+
+_load_optional_ml_env()
 
 
 class Settings(BaseSettings):
-    """Application settings"""
+    """Application settings."""
 
-    # Database
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        "sqlite:///./mamacare-ai.db"
-    )
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./mamacare-ai.db")
 
-    # Security
-    SECRET_KEY: str = os.getenv(
-        "SECRET_KEY", "your-secret-key-change-in-production")
+    SECRET_KEY: str = os.getenv("SECRET_KEY", DEFAULT_SECRET_KEY)
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
-    # CORS
-    CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "*").split(",")
-    ALLOWED_HOSTS: List[str] = os.getenv("ALLOWED_HOSTS", "*").split(",")
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development").lower()
+    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "info").lower()
 
-    # ML Model paths - use absolute paths relative to backend directory
-    # Go up from app/config.py to backend/
-    _backend_dir = Path(__file__).parent.parent
-    _project_root = _backend_dir.parent  # Go up from backend/ to project root
-    _default_model_dir = _project_root / "ai-development" / "ml-model" / "models"
-
-    MODEL_PATH: str = os.getenv(
-        "MODEL_PATH",
-        # Try best_model file first (actual model), fallback to model_hackathon.pkl (metadata)
-        str(_default_model_dir / "best_model_hachathon_gradient_boosting.pkl") if (_default_model_dir /
-                                                                                   "best_model_hachathon_gradient_boosting.pkl").exists() else str(_default_model_dir / "model_hackathon.pkl")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    CORS_ORIGINS: List[str] = _parse_csv_env(
+        os.getenv("CORS_ORIGINS"),
+        [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+        ],
     )
+    ALLOWED_HOSTS: List[str] = _parse_csv_env(
+        os.getenv("ALLOWED_HOSTS"),
+        [
+            "localhost",
+            "127.0.0.1",
+        ],
+    )
+
+    MODEL_PATH: str = os.getenv("MODEL_PATH", _resolve_default_model_path())
     LABEL_ENCODER_PATH: str = os.getenv(
         "LABEL_ENCODER_PATH",
-        str(_default_model_dir / "label_encoder_hackathon.pkl")
+        str(MODEL_ROOT / "label_encoder_hackathon.pkl"),
     )
     FEATURE_NAMES_PATH: str = os.getenv(
         "FEATURE_NAMES_PATH",
-        str(_default_model_dir / "feature_names_hackathon.pkl")
+        str(MODEL_ROOT / "feature_names_hackathon.pkl"),
     )
     SCALER_PATH: str = os.getenv(
         "SCALER_PATH",
-        str(_default_model_dir / "scaler_hackathon.pkl")
+        str(MODEL_ROOT / "scaler_hackathon.pkl"),
     )
 
-    # SMS Service (Twilio credentials from AI-development backend if available)
-    # twilio or africas_talking
     SMS_PROVIDER: str = os.getenv("SMS_PROVIDER", "twilio")
     TWILIO_ACCOUNT_SID: str = os.getenv("TWILIO_ACCOUNT_SID", "")
     TWILIO_AUTH_TOKEN: str = os.getenv("TWILIO_AUTH_TOKEN", "")
     TWILIO_PHONE_NUMBER: str = os.getenv("TWILIO_PHONE_NUMBER", "")
-    TWILIO_MESSAGING_SERVICE_SID: str = os.getenv(
-        "TWILIO_MESSAGING_SERVICE_SID", "")
+    TWILIO_MESSAGING_SERVICE_SID: str = os.getenv("TWILIO_MESSAGING_SERVICE_SID", "")
 
-    # Email Service (Gmail SMTP)
     SMTP_HOST: str = os.getenv("SMTP_HOST", "smtp.gmail.com")
     SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
-    SMTP_USER: str = os.getenv("SMTP_USER", "")  # Your Gmail address
-    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")  # Gmail App Password
+    SMTP_USER: str = os.getenv("SMTP_USER", "")
+    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
     EMAIL_ENABLED: bool = os.getenv("EMAIL_ENABLED", "False").lower() == "true"
 
-    # App settings
-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
-    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+    GOOGLE_APPLICATION_CREDENTIALS: str = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
 
-    # Bank Transfer Settings
     BANK_ACCOUNT_NUMBER: str = os.getenv("BANK_ACCOUNT_NUMBER", "1497478053")
-    BANK_ACCOUNT_NAME: str = os.getenv(
-        "BANK_ACCOUNT_NAME", "MamaCare AI Limited")
+    BANK_ACCOUNT_NAME: str = os.getenv("BANK_ACCOUNT_NAME", "MamaCare AI Limited")
     BANK_NAME: str = os.getenv("BANK_NAME", "Access Bank")
-    BANK_SUPPORT_EMAIL: str = os.getenv(
-        "BANK_SUPPORT_EMAIL", "support@mamacare.ai")
-    BANK_SUPPORT_PHONE: str = os.getenv(
-        "BANK_SUPPORT_PHONE", "+234-XXX-XXXX-XXXX")
+    BANK_SUPPORT_EMAIL: str = os.getenv("BANK_SUPPORT_EMAIL", "support@mamacare.ai")
+    BANK_SUPPORT_PHONE: str = os.getenv("BANK_SUPPORT_PHONE", "+234-XXX-XXXX-XXXX")
 
     class Config:
         env_file = ".env"
         case_sensitive = True
+
+    @property
+    def is_production(self) -> bool:
+        return self.ENVIRONMENT == "production"
+
+    def validate_production(self) -> None:
+        if not self.is_production:
+            return
+
+        issues: List[str] = []
+
+        if self.SECRET_KEY == DEFAULT_SECRET_KEY:
+            issues.append("SECRET_KEY must be set to a secure value in production.")
+
+        if len(self.SECRET_KEY) < 32:
+            issues.append("SECRET_KEY must be at least 32 characters long in production.")
+
+        if "*" in self.CORS_ORIGINS:
+            issues.append("CORS_ORIGINS must be explicitly configured in production.")
+
+        if "*" in self.ALLOWED_HOSTS:
+            issues.append("ALLOWED_HOSTS must be explicitly configured in production.")
+
+        required_paths = {
+            "MODEL_PATH": self.MODEL_PATH,
+            "LABEL_ENCODER_PATH": self.LABEL_ENCODER_PATH,
+            "FEATURE_NAMES_PATH": self.FEATURE_NAMES_PATH,
+            "SCALER_PATH": self.SCALER_PATH,
+        }
+
+        missing_paths = [name for name, path in required_paths.items() if not Path(path).exists()]
+        if missing_paths:
+            issues.append(f"Missing required model assets: {', '.join(missing_paths)}.")
+
+        if issues:
+            raise RuntimeError("Production configuration is invalid:\n- " + "\n- ".join(issues))
 
 
 settings = Settings()

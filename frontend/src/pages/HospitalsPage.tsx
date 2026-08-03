@@ -269,10 +269,8 @@ export default function HospitalsPage() {
           <AlertCircle className="h-12 w-12 text-danger-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('error_loading_hospitals', 'Error Loading Hospitals')}</h2>
           <p className="text-gray-600 mb-4">
-            {error instanceof Error 
-              ? error.message 
-              : typeof error === 'object' && error !== null && 'message' in error
-              ? String(error.message)
+            {error instanceof Error
+              ? error.message
               : t('unknown_error', 'Unknown error')}
           </p>
           <div className="text-xs text-gray-500 mb-4">

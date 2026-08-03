@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import type { AxiosError } from 'axios';
 import { pregnancyApi, predictionApi, recommendationsApi } from '../services/api';
 import { 
   ShieldAlert, 
@@ -28,6 +29,11 @@ import { useTranslation } from '../contexts/TranslationContext';
 export default function RiskAssessmentPage() {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+
+  const getErrorDetail = (queryError: unknown) => {
+    const axiosError = queryError as AxiosError<{ detail?: string }>;
+    return axiosError.response?.data?.detail;
+  };
 
   const { data: pregnancy } = useQuery({
     queryKey: ['pregnancy', 'current'],
@@ -395,8 +401,8 @@ export default function RiskAssessmentPage() {
           </div>
           <h3 className="text-2xl font-bold text-gray-900 mb-3">No Assessment Available</h3>
           <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto">
-            {error && typeof error === 'object' && 'response' in error && error.response?.data?.detail
-              ? error.response.data.detail
+            {getErrorDetail(error)
+              ? getErrorDetail(error)
               : 'Please add health records to generate a risk assessment'}
           </p>
           <Link

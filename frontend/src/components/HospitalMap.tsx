@@ -20,7 +20,7 @@ if (typeof window !== 'undefined') {
 // Create icons as functions to avoid re-creation issues
 // Initialize icons properly to avoid Leaflet cleanup errors
 const createHospitalIcon = () => {
-  const icon = new L.Icon({
+  return new L.Icon({
     iconUrl: 'data:image/svg+xml;base64,' + btoa(`
       <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="16" cy="16" r="14" fill="#ef4444" stroke="white" stroke-width="2"/>
@@ -31,15 +31,10 @@ const createHospitalIcon = () => {
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
   });
-  // Ensure icon has proper Leaflet initialization
-  if (!icon._leaflet_events) {
-    icon._leaflet_events = {};
-  }
-  return icon;
 };
 
 const createUserLocationIcon = () => {
-  const icon = new L.Icon({
+  return new L.Icon({
     iconUrl: 'data:image/svg+xml;base64,' + btoa(`
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="10" fill="#3b82f6" stroke="white" stroke-width="2"/>
@@ -49,21 +44,11 @@ const createUserLocationIcon = () => {
     iconSize: [24, 24],
     iconAnchor: [12, 12],
   });
-  // Ensure icon has proper Leaflet initialization
-  if (!icon._leaflet_events) {
-    icon._leaflet_events = {};
-  }
-  return icon;
 };
 
 // Default hospital icon (non-selected)
 const createDefaultHospitalIcon = () => {
-  const icon = new L.Icon.Default();
-  // Ensure icon has proper Leaflet initialization
-  if (!icon._leaflet_events) {
-    icon._leaflet_events = {};
-  }
-  return icon;
+  return new L.Icon.Default();
 };
 
 interface MapControllerProps {
