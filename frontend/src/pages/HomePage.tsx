@@ -17,9 +17,9 @@ export default function HomePage() {
 
   return (
     <div className="page-shell">
-      <header className="fixed inset-x-0 top-0 z-50 px-4 py-4 sm:px-6 lg:px-8">
+      <header className="absolute inset-x-0 top-0 z-50 px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-0 py-2 text-white">
-          <img src="/logo.png" alt="MamaCare AI Logo" className="h-14 w-14 sm:h-16 sm:w-16 object-contain drop-shadow-lg" />
+          <img src="/logo.png" alt="MamaCare AI Logo" className="h-12 w-12 sm:h-16 sm:w-16 object-contain drop-shadow-lg" />
           <button
             type="button"
             onClick={toggleTheme}
@@ -33,7 +33,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section with Background Image */}
-      <section className="relative overflow-hidden min-h-screen flex items-center pt-28">
+      <section className="relative overflow-hidden min-h-screen flex items-center pt-20 sm:pt-24 lg:pt-28">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -45,35 +45,35 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-primary-900/85 via-primary-800/75 to-primary-900/85"></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-12 items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 lg:py-20 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-8 lg:gap-12 items-center">
             {/* Left Content */}
-            <div className="text-center lg:text-left fade-in max-w-3xl">
-              <div className="inline-block mb-5 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
-                <span className="text-sm sm:text-base font-semibold text-white">AI-enabled maternal care for mothers, providers, and public health teams</span>
+            <div className="text-center lg:text-left fade-in max-w-3xl mx-auto lg:mx-0">
+              <div className="inline-block mb-4 px-3.5 py-1.5 sm:px-4 sm:py-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30 text-center">
+                <span className="text-xs sm:text-base font-semibold text-white">AI-enabled maternal care for mothers, providers, and public health teams</span>
               </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-5 leading-[1.02] drop-shadow-2xl">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-5 leading-snug sm:leading-[1.02] drop-shadow-2xl text-center lg:text-left">
                 Safer pregnancy journeys,
-                <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-primary-200 via-white to-primary-100">
+                <span className="block mt-1 sm:mt-2 text-transparent bg-clip-text bg-gradient-to-r from-primary-200 via-white to-primary-100">
                   smarter risk detection,
                 </span>
                 and timely care when it matters most.
               </h1>
-              <p className="text-lg sm:text-xl lg:text-2xl text-white/95 mb-7 leading-relaxed drop-shadow-lg max-w-2xl lg:mx-0 mx-auto">
+              <p className="text-base sm:text-xl lg:text-2xl text-white/95 mb-6 sm:mb-7 leading-relaxed drop-shadow-lg max-w-2xl mx-auto lg:mx-0 text-center lg:text-left">
                 MamaCare AI helps pregnant women stay informed, supports healthcare providers with early risk signals,
                 and gives health programs a more reliable way to coordinate maternal care.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-2">
+              <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-4 justify-center lg:justify-start mt-2 max-w-sm sm:max-w-none mx-auto lg:mx-0">
                 <Link
                   to="/register"
-                  className="btn-primary text-lg sm:text-xl px-8 sm:px-10 py-4 sm:py-5 inline-flex items-center justify-center group bg-white text-primary-600 hover:bg-primary-50 shadow-2xl hover:shadow-primary-500/30 transform hover:scale-105 transition-all duration-300"
+                  className="btn-primary text-base sm:text-xl px-7 sm:px-10 py-3.5 sm:py-5 inline-flex items-center justify-center group bg-white text-primary-600 hover:bg-primary-50 shadow-2xl hover:shadow-primary-500/30 transform hover:scale-105 transition-all duration-300"
                 >
                   Get Started
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   to="/login"
-                  className="btn-secondary text-lg sm:text-xl px-8 sm:px-10 py-4 sm:py-5 inline-flex items-center justify-center bg-white/10 text-white border-2 border-white/30 hover:bg-white/20 backdrop-blur-md hover:border-white/50 transform hover:scale-105 transition-all duration-300"
+                  className="btn-secondary text-base sm:text-xl px-7 sm:px-10 py-3.5 sm:py-5 inline-flex items-center justify-center bg-white/10 text-white border-2 border-white/30 hover:bg-white/20 backdrop-blur-md hover:border-white/50 transform hover:scale-105 transition-all duration-300"
                 >
                   Sign In
                 </Link>
