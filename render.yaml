@@ -20,6 +20,6 @@ services:
       - key: CORS_ORIGINS
         value: https://your-vercel-app.vercel.app
       - key: ALLOWED_HOSTS
-        value: your-render-service.onrender.com
+        value: localhost,127.0.0.1,*.onrender.com,*.vercel.app,*.netlify.app
       - key: FRONTEND_URL
         value: https://your-vercel-app.vercel.app
