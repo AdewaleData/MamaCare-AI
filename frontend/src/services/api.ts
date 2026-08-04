@@ -44,7 +44,7 @@ const resolvedApiBaseUrl = resolveApiBaseUrl();
 
 const api = axios.create({
   baseURL: resolvedApiBaseUrl,
-  timeout: 30000,
+  timeout: 60000, // 60s timeout to handle Render free tier cold-starts (container wake-up)
   headers: {
     'Content-Type': 'application/json',
   },
@@ -62,10 +62,24 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle errors
+// Response interceptor to handle errors and cold-start retries
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const config = error.config;
+
+    // Retry once on timeout / network error / 504 Gateway Timeout (e.g., Render free tier spinning up)
+    if (
+      config &&
+      !config._isRetry &&
+      (error.code === 'ECONNABORTED' || !error.response || error.response?.status === 504)
+    ) {
+      config._isRetry = true;
+      console.warn('[API] Request timed out or network error (Render free tier cold start). Retrying in 3s...', config.url);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      return api(config);
+    }
+
     if (error.response?.status === 401) {
       // Don't redirect if:
       // 1. Already on login/register page
