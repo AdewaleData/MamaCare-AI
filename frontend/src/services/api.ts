@@ -16,10 +16,34 @@ import type {
   EmergencyContact,
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+const DEFAULT_PRODUCTION_API_URL = 'https://mamacare-backend.onrender.com/api/v1';
+
+const normalizeBaseUrl = (value: string) => {
+  if (!value) return '';
+  return value.endsWith('/') ? value.slice(0, -1) : value;
+};
+
+const resolveApiBaseUrl = () => {
+  const configured = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL || '');
+  if (configured) {
+    return configured;
+  }
+
+  if (typeof window !== 'undefined') {
+    const { hostname } = window.location;
+    const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
+    if (isLocalHost) {
+      return '/api/v1';
+    }
+  }
+
+  return DEFAULT_PRODUCTION_API_URL;
+};
+
+const resolvedApiBaseUrl = resolveApiBaseUrl();
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: resolvedApiBaseUrl,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -48,18 +72,18 @@ api.interceptors.response.use(
       // 2. This is a login/register request (they can fail with 401)
       // 3. This is a getCurrentUser request during login flow
       // 4. This is a translations request (it's public)
-      const isAuthEndpoint = error.config?.url?.includes('/auth/login') || 
-                            error.config?.url?.includes('/auth/register');
+      const isAuthEndpoint = error.config?.url?.includes('/auth/login') ||
+        error.config?.url?.includes('/auth/register');
       const isGetCurrentUser = error.config?.url?.includes('/auth/users/me');
       const isTranslations = error.config?.url?.includes('/translations');
-      const isLoginPage = window.location.pathname === '/login' || 
-                         window.location.pathname === '/register';
-      
+      const isLoginPage = window.location.pathname === '/login' ||
+        window.location.pathname === '/register';
+
       // Only clear auth and redirect if it's a real 401 (not during login flow or public endpoints)
       if (!isAuthEndpoint && !isGetCurrentUser && !isTranslations && !isLoginPage) {
         console.log('401 Unauthorized - clearing auth and redirecting to login');
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
         useAuthStore.getState().logout();
         // Use replace to avoid adding to history
         window.location.replace('/login');
@@ -182,7 +206,7 @@ export const providersApi = {
       searchParams.append('sort_by', params?.sort_by || 'name');
       // Always include verified_only, default to false to show all providers
       searchParams.append('verified_only', (params?.verified_only ?? false).toString());
-      
+
       const url = `/providers?${searchParams.toString()}`;
       console.log('[providersApi] Calling:', url);
       const response = await api.get(url);
@@ -229,8 +253,8 @@ export const healthApi = {
 export const predictionApi = {
   assessRisk: async (pregnancyId: string): Promise<RiskAssessment> => {
     // Backend will automatically use latest health record if no data provided
-    const response = await api.post('/predictions/assess', { 
-      pregnancy_id: pregnancyId 
+    const response = await api.post('/predictions/assess', {
+      pregnancy_id: pregnancyId
       // Don't send health data - backend will use latest health record
     });
     return response.data;
@@ -248,7 +272,7 @@ export const predictionApi = {
     }
   },
 
-  getHistory: async (pregnancyId: string): Promise<{assessments: RiskAssessment[], total: number} | RiskAssessment[]> => {
+  getHistory: async (pregnancyId: string): Promise<{ assessments: RiskAssessment[], total: number } | RiskAssessment[]> => {
     const response = await api.get(`/predictions/history/${pregnancyId}`);
     return response.data;
   },
@@ -734,9 +758,9 @@ export const offlineApi = {
 export const dashboardApi = {
   getProvider: async (): Promise<any> => {
     try {
-    const response = await api.get('/dashboards/provider');
+      const response = await api.get('/dashboards/provider');
       console.log('[Dashboard API] Provider dashboard response:', response.data);
-    return response.data;
+      return response.data;
     } catch (error: any) {
       console.error('[Dashboard API] Error fetching provider dashboard:', error);
       console.error('[Dashboard API] Error response:', error.response?.data);
@@ -776,13 +800,13 @@ export const voiceApi = {
     if (language) params.language = language;
     // Always include page_type, default to 'dashboard' if not provided
     params.page_type = pageType || 'dashboard';
-    
+
     console.log('[API] Calling voice/summarize with params:', params);
     const response = await api.get('/voice/summarize', { params });
     console.log('[API] Voice summary response:', response.data);
     return response.data;
   },
-  
+
   generateSpeech: async (text: string, language: string): Promise<Blob> => {
     const response = await api.post('/voice/speak', null, {
       params: { text, language },
@@ -790,7 +814,7 @@ export const voiceApi = {
     });
     return response.data;
   },
-  
+
   getTtsStatus: async (): Promise<{
     available: boolean;
     supported_languages: string[];
