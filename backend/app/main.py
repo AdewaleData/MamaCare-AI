@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 import logging
+import threading
 from contextlib import asynccontextmanager
 
 from app.config import settings
@@ -43,6 +44,30 @@ _ = message.Message  # Force Message model to resolve relationships
 logging.basicConfig(level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))
 logger = logging.getLogger(__name__)
 
+# Track ML model loading state (updated by background thread)
+_models_ready = False
+_models_loading = False
+
+
+def _load_models_background():
+    """Load ML models in a background thread so the server starts accepting
+    requests immediately. Login/signup/translations all work before models
+    are ready — only risk assessment requires them."""
+    global _models_ready, _models_loading
+    _models_loading = True
+    try:
+        logger.info("Background: loading ML models...")
+        model_loader = get_model_loader()
+        if model_loader.is_ready():
+            _models_ready = True
+            logger.info("✓✓✓ Background: ML Models ready for predictions! ✓✓✓")
+        else:
+            logger.error("✗✗✗ Background: ML Models failed to load! ✗✗✗")
+    except Exception as e:
+        logger.error(f"Background: Error loading ML models: {e}", exc_info=True)
+    finally:
+        _models_loading = False
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -52,28 +77,21 @@ async def lifespan(app: FastAPI):
     logger.info("=" * 60)
     settings.validate_production()
 
-    # Initialize database
+    # Initialize database (fast — creates tables if not exist)
     init_db()
 
-    # Initialize ML models - REQUIRED, no fallback
-    try:
-        logger.info("Initializing ML models...")
-        model_loader = get_model_loader()
-        if model_loader.is_ready():
-            logger.info("✓✓✓ ML Models ready for predictions! ✓✓✓")
-        else:
-            logger.error(
-                "✗✗✗ ML Models failed to load! Risk assessment will not work. ✗✗✗")
-            raise RuntimeError(
-                "ML models failed to load. Check model files in ai-development/ml-model/models/")
-    except Exception as e:
-        logger.error(f"Error initializing ML models: {e}", exc_info=True)
-        logger.error(
-            "Backend will start but risk assessment will fail until models are loaded.")
-        # Don't raise - allow backend to start, but risk assessment will fail with clear error
-
+    # Load ML models in a background thread.
+    # KEY FIX: Previously models loaded synchronously here, blocking the server
+    # from accepting ANY connections until done (30-60s on cold start).
+    # This caused ALL requests — including login/signup — to timeout.
+    # Now the server accepts requests immediately; only /predictions waits for models.
+    t = threading.Thread(target=_load_models_background, daemon=True, name="ml-model-loader")
+    t.start()
+    logger.info("ML model loading started in background — server accepting requests NOW")
     logger.info("=" * 60)
+
     yield
+
     logger.info("Shutting down MamaCare AI Backend")
 
 
@@ -130,12 +148,13 @@ app.include_router(websocket.router, tags=["WebSocket"])
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check — always responds immediately, even while models are loading"""
     return {
         "status": "healthy",
         "service": "MamaCare AI",
         "environment": settings.ENVIRONMENT,
-        "model_ready": get_model_loader().is_ready(),
+        "model_ready": _models_ready,
+        "model_loading": _models_loading,
     }
 
 
