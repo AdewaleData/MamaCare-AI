@@ -29,12 +29,11 @@ const resolveApiBaseUrl = () => {
     return configured;
   }
 
+  // In browser environments (both local dev and production on Vercel/Netlify),
+  // use relative path '/api/v1' so requests are proxied (via Vite dev proxy or vercel.json rewrites).
+  // This avoids browser CORS preflight overhead and direct cross-origin connection timeouts.
   if (typeof window !== 'undefined') {
-    const { hostname } = window.location;
-    const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
-    if (isLocalHost) {
-      return '/api/v1';
-    }
+    return '/api/v1';
   }
 
   return DEFAULT_PRODUCTION_API_URL;
