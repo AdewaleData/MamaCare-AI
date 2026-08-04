@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: mamacare-backend
+    env: python
+    rootDir: .
+    buildCommand: cd backend && pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: cd backend && python run_server.py
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.7
+      - key: HOST
+        value: 0.0.0.0
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://your-vercel-app.vercel.app
+      - key: ALLOWED_HOSTS
+        value: your-render-service.onrender.com
+      - key: FRONTEND_URL
+        value: https://your-vercel-app.vercel.app
