@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 from dotenv import load_dotenv
 from pydantic import ValidationInfo, field_validator
@@ -102,15 +102,11 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "info").lower()
 
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
-    # NOTE: Do NOT call os.getenv() here as the default.  pydantic-settings
-    # reads env vars itself and passes them through the field_validator below.
-    # Putting os.getenv() in the class body causes double-parsing and bypasses
-    # enable_decoding=False, leading to JSONDecodeError on Render/production.
-    CORS_ORIGINS: List[str] = [
+    CORS_ORIGINS: Union[str, List[str]] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ]
-    ALLOWED_HOSTS: List[str] = [
+    ALLOWED_HOSTS: Union[str, List[str]] = [
         "localhost",
         "127.0.0.1",
         "*.onrender.com",
