@@ -19,13 +19,7 @@ export default function HomePage() {
     <div className="page-shell">
       <header className="fixed inset-x-0 top-0 z-50 px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-0 py-2 text-white">
-          <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-slate-950/20 px-3 py-2 backdrop-blur-md">
-            <img src="/logo.png" alt="MamaCare AI Logo" className="h-14 w-14 sm:h-16 sm:w-16 object-contain drop-shadow-lg" />
-            <div className="hidden sm:block">
-              <p className="text-lg font-bold leading-none text-white">MamaCare AI</p>
-              <p className="mt-1 text-xs font-medium text-white/80">Maternal health support platform</p>
-            </div>
-          </div>
+          <img src="/logo.png" alt="MamaCare AI Logo" className="h-14 w-14 sm:h-16 sm:w-16 object-contain drop-shadow-lg" />
           <button
             type="button"
             onClick={toggleTheme}
@@ -59,26 +53,16 @@ export default function HomePage() {
                 <span className="text-sm sm:text-base font-semibold text-white">AI-enabled maternal care for mothers, providers, and public health teams</span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-5 leading-[1.02] drop-shadow-2xl">
-                Better pregnancy care,
+                Safer pregnancy journeys,
                 <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-primary-200 via-white to-primary-100">
-                  clearer risk insight,
+                  smarter risk detection,
                 </span>
-                faster support when it matters most.
+                and timely care when it matters most.
               </h1>
               <p className="text-lg sm:text-xl lg:text-2xl text-white/95 mb-7 leading-relaxed drop-shadow-lg max-w-2xl lg:mx-0 mx-auto">
                 MamaCare AI helps pregnant women stay informed, supports healthcare providers with early risk signals,
                 and gives health programs a more reliable way to coordinate maternal care.
               </p>
-              <div className="mb-8 flex flex-wrap justify-center gap-3 lg:justify-start">
-                {['Easy to understand', 'Faster emergency response', 'Built for real care teams'].map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm sm:text-base font-medium text-white/95 backdrop-blur-md"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-2">
                 <Link
                   to="/register"
@@ -98,7 +82,7 @@ export default function HomePage() {
 
             {/* Right Image - African Pregnant Woman */}
             <div className="relative hidden lg:flex fade-in justify-center" style={{ animationDelay: '200ms' }}>
-              <div className="relative z-10 w-full max-w-[21rem] xl:max-w-[24rem] rounded-3xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
+              <div className="relative z-10 w-full max-w-[24rem] xl:max-w-[27rem] rounded-3xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
                 {/* Actual image */}
                 <img
                   src="/pregnant_women.jpg"

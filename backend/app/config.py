@@ -1,9 +1,11 @@
+import json
 import os
 from pathlib import Path
 from typing import List
 
 from dotenv import load_dotenv
-from pydantic_settings import BaseSettings
+from pydantic import ValidationInfo, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 BACKEND_ROOT = PROJECT_ROOT / "backend"
@@ -17,6 +19,31 @@ def _parse_csv_env(value: str | None, fallback: List[str]) -> List[str]:
 
     parsed = [item.strip() for item in value.split(",") if item.strip()]
     return parsed or fallback
+
+
+def _parse_list_env(value: str | List[str] | None, fallback: List[str]) -> List[str]:
+    if value is None:
+        return fallback
+
+    if isinstance(value, list):
+        parsed = [item.strip() for item in value if isinstance(item, str) and item.strip()]
+        return parsed or fallback
+
+    raw_value = value.strip()
+    if not raw_value:
+        return fallback
+
+    if raw_value.startswith("["):
+        try:
+            decoded = json.loads(raw_value)
+        except json.JSONDecodeError:
+            decoded = None
+
+        if isinstance(decoded, list):
+            parsed = [item.strip() for item in decoded if isinstance(item, str) and item.strip()]
+            return parsed or fallback
+
+    return _parse_csv_env(raw_value, fallback)
 
 
 def _load_optional_ml_env() -> None:
@@ -51,6 +78,12 @@ _load_optional_ml_env()
 
 class Settings(BaseSettings):
     """Application settings."""
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        enable_decoding=False,
+    )
 
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./mamacare-ai.db")
 
@@ -115,9 +148,28 @@ class Settings(BaseSettings):
     BANK_SUPPORT_EMAIL: str = os.getenv("BANK_SUPPORT_EMAIL", "support@mamacare.ai")
     BANK_SUPPORT_PHONE: str = os.getenv("BANK_SUPPORT_PHONE", "+234-XXX-XXXX-XXXX")
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    @field_validator("CORS_ORIGINS", "ALLOWED_HOSTS", mode="before")
+    @classmethod
+    def parse_list_fields(
+        cls,
+        value: str | List[str] | None,
+        info: ValidationInfo,
+    ) -> List[str]:
+        field_defaults = {
+            "CORS_ORIGINS": [
+                "http://localhost:3000",
+                "http://127.0.0.1:3000",
+            ],
+            "ALLOWED_HOSTS": [
+                "localhost",
+                "127.0.0.1",
+                "*.onrender.com",
+                "*.vercel.app",
+                "*.netlify.app",
+            ],
+        }
+
+        return _parse_list_env(value, field_defaults[info.field_name])
 
     @property
     def is_production(self) -> bool:
