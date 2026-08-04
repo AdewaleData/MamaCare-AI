@@ -165,12 +165,9 @@ async def notify_emergency_contacts_task(user_id: str, alert_id: str, severity: 
             phone_numbers = [str(row[0]) for row in rows if row[0]]
         
         if phone_numbers:
-            
-            # Send SMS alerts
-            if phone_numbers:
-                message = f"🚨 EMERGENCY ALERT: {user.full_name} needs immediate assistance. Severity: {severity.upper()}. Alert ID: {alert_id[:8]}. Please contact them immediately."
-                result = await SMSService.send_sms_twilio(phone_numbers, message)
-                logger.info(f"Emergency SMS sent: {result}")
+            message = f"🚨 EMERGENCY ALERT: {user.full_name} needs immediate assistance. Severity: {severity.upper()}. Alert ID: {alert_id[:8]}. Please contact them immediately."
+            result = await SMSService.send_sms_twilio(phone_numbers, message)
+            logger.info(f"Emergency SMS sent: {result}")
         
         # Update alert
         alert = db.query(EmergencyAlert).filter(EmergencyAlert.id == alert_id).first()

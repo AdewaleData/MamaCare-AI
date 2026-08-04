@@ -184,12 +184,13 @@ async def assess_risk(
             request.mental_health = request.mental_health if request.mental_health is not None else (latest_record.mental_health or 0)
             request.age = request.age or current_user.age or 28
         
-        # Check for existing risk assessment first (before validation)
-        # This allows returning cached results even if some data is missing
-            latest_assessment = db.query(RiskAssessment).filter(
-                RiskAssessment.pregnancy_id == request.pregnancy_id
-            ).order_by(RiskAssessment.assessed_at.desc()).first()
-            
+        # Always fetch latest assessment regardless of whether request data was provided.
+        # Previously this was inside the if block above, causing UnboundLocalError when
+        # the caller sent health data in the request body (has_request_data=True).
+        latest_assessment = db.query(RiskAssessment).filter(
+            RiskAssessment.pregnancy_id == request.pregnancy_id
+        ).order_by(RiskAssessment.assessed_at.desc()).first()
+
         # ALWAYS recalculate if we have new health data
         # This ensures risk assessment updates when new records are added
         should_recalculate = True

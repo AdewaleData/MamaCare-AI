@@ -82,6 +82,12 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,
+        # Disable automatic JSON decoding for list fields so our
+        # field_validator (which handles both CSV and JSON formats)
+        # is the sole parsing path. Without this, pydantic-settings
+        # attempts json.loads() on the raw env value BEFORE calling
+        # the validator, crashing on plain CSV strings like:
+        #   CORS_ORIGINS=https://foo.com,https://bar.com
         enable_decoding=False,
     )
 
@@ -96,23 +102,21 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "info").lower()
 
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
-    CORS_ORIGINS: List[str] = _parse_csv_env(
-        os.getenv("CORS_ORIGINS"),
-        [
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-        ],
-    )
-    ALLOWED_HOSTS: List[str] = _parse_csv_env(
-        os.getenv("ALLOWED_HOSTS"),
-        [
-            "localhost",
-            "127.0.0.1",
-            "*.onrender.com",
-            "*.vercel.app",
-            "*.netlify.app",
-        ],
-    )
+    # NOTE: Do NOT call os.getenv() here as the default.  pydantic-settings
+    # reads env vars itself and passes them through the field_validator below.
+    # Putting os.getenv() in the class body causes double-parsing and bypasses
+    # enable_decoding=False, leading to JSONDecodeError on Render/production.
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+    ALLOWED_HOSTS: List[str] = [
+        "localhost",
+        "127.0.0.1",
+        "*.onrender.com",
+        "*.vercel.app",
+        "*.netlify.app",
+    ]
 
     MODEL_PATH: str = os.getenv("MODEL_PATH", _resolve_default_model_path())
     LABEL_ENCODER_PATH: str = os.getenv(

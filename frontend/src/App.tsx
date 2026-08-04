@@ -27,60 +27,37 @@ import ChatPage from './pages/ChatPage';
 import ProvidersPage from './pages/ProvidersPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-  // Simple check: look in localStorage directly (most reliable)
-  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean | null>(null);
-  
-  React.useEffect(() => {
-    // Check if we have a token
-    const token = localStorage.getItem('access_token');
-    const hasToken = !!token;
-    
-    // If we have token in localStorage but not in store, sync it
-    if (hasToken) {
-      const storeToken = useAuthStore.getState().token;
-      if (!storeToken) {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          try {
-            const parsedUser = JSON.parse(storedUser);
-            useAuthStore.setState({ token, user: parsedUser });
-          } catch {
-            // Invalid user data, but we still have token
-            useAuthStore.setState({ token, user: null });
-          }
-        } else {
+  // localStorage.getItem is synchronous — no need for useEffect or a null loading state.
+  // Reading it directly during render eliminates the brief loading spinner flash that
+  // appeared on every protected page navigation with the previous useEffect approach.
+  const token = localStorage.getItem('access_token');
+  const isAuthenticated = !!token;
+
+  // If we have a token in localStorage but the Zustand store hasn't been synced yet, sync it now
+  if (token) {
+    const storeToken = useAuthStore.getState().token;
+    if (!storeToken) {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          useAuthStore.setState({ token, user: parsedUser });
+        } catch {
+          // Invalid user JSON, but we still have a valid token
           useAuthStore.setState({ token, user: null });
         }
+      } else {
+        useAuthStore.setState({ token, user: null });
       }
     }
-    
-    setIsAuthenticated(hasToken);
-  }, []);
-  
-  // Wait for initial check - show loading instead of blank
-  if (isAuthenticated === null) {
-    return (
-      <div className="page-shell flex min-h-screen items-center justify-center">
-        <div className="text-center fade-in">
-          <div className="relative">
-            <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary-200 border-r-primary-600"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-8 w-8 bg-primary-600 rounded-full animate-pulse"></div>
-            </div>
-          </div>
-          <p className="mt-6 text-lg font-semibold text-gray-700">Loading MamaCare AI...</p>
-          <p className="mt-2 text-sm text-gray-500">Please wait</p>
-        </div>
-      </div>
-    );
   }
-  
+
   // If no token, redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  
-  // If we have token, show children
+
+  // If we have a token, render children immediately (no flicker)
   return <>{children}</>;
 }
 
@@ -166,4 +143,3 @@ function App() {
 }
 
 export default App;
-

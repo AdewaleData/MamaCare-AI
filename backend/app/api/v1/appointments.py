@@ -178,36 +178,9 @@ async def create_appointment(
             detail=f"Failed to create appointment: {str(e)}"
         )
 
-
-@router.get("/{pregnancy_id}")
-async def get_appointments(
-    pregnancy_id: str,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    """Get appointments for a pregnancy"""
-    try:
-        # Verify pregnancy exists and belongs to current user
-        pregnancy = db.query(Pregnancy).filter(Pregnancy.id == pregnancy_id).first()
-        if not pregnancy:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pregnancy not found")
-        
-        if pregnancy.user_id != current_user.id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You can only view appointments for your own pregnancies"
-            )
-        
-        appointments = db.query(Appointment).filter(
-            Appointment.pregnancy_id == pregnancy_id
-        ).order_by(Appointment.appointment_date).all()
-        
-        return {"appointments": appointments, "total": len(appointments)}
-        
-    except Exception as e:
-        logger.error(f"Error fetching appointments: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch appointments")
-
+# NOTE: All specific /provider/* GET routes MUST come before GET /{pregnancy_id}.
+# FastAPI matches routes in registration order; the wildcard /{pregnancy_id} would
+# swallow requests to /provider/pending and /provider/all if registered first.
 
 @router.get("/provider/pending")
 async def get_pending_appointments(
@@ -375,6 +348,37 @@ async def get_appointment_details(
     except Exception as e:
         logger.error(f"Error fetching appointment details: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch appointment")
+
+
+# Wildcard route MUST come last — registered after all /provider/* routes above
+@router.get("/{pregnancy_id}")
+async def get_appointments(
+    pregnancy_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get appointments for a pregnancy"""
+    try:
+        # Verify pregnancy exists and belongs to current user
+        pregnancy = db.query(Pregnancy).filter(Pregnancy.id == pregnancy_id).first()
+        if not pregnancy:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pregnancy not found")
+        
+        if pregnancy.user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only view appointments for your own pregnancies"
+            )
+        
+        appointments = db.query(Appointment).filter(
+            Appointment.pregnancy_id == pregnancy_id
+        ).order_by(Appointment.appointment_date).all()
+        
+        return {"appointments": appointments, "total": len(appointments)}
+        
+    except Exception as e:
+        logger.error(f"Error fetching appointments: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch appointments")
 
 
 class AppointmentStatusUpdate(BaseModel):

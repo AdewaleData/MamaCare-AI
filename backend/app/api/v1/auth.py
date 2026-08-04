@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas.user import UserCreate, UserLogin, UserResponse, UserUpdate
@@ -118,10 +119,14 @@ async def update_current_user(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update user")
 
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
 @router.post("/users/me/change-password")
 async def change_password(
-    current_password: str,
-    new_password: str,
+    request: ChangePasswordRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -130,11 +135,11 @@ async def change_password(
         from app.utils.security import verify_password, hash_password
         
         # Verify current password
-        if not verify_password(current_password, current_user.password_hash):
+        if not verify_password(request.current_password, current_user.password_hash):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Current password is incorrect")
         
         # Update password
-        current_user.password_hash = hash_password(new_password)
+        current_user.password_hash = hash_password(request.new_password)
         db.commit()
         
         logger.info(f"Password changed for user: {current_user.email}")

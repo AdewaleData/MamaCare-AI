@@ -133,7 +133,7 @@ async def send_message(
             str(message.receiver_id),
             {
                 "type": "chat_message",
-                "message": message_response.dict(),
+                "message": message_response.model_dump(),
                 "timestamp": datetime.utcnow().isoformat()
             }
         )

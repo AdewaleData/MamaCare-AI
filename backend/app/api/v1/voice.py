@@ -3,6 +3,7 @@ Voice Assistant API
 Provides AI-powered voice summaries and navigation guidance for all pages
 """
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
@@ -694,10 +695,14 @@ async def get_page_summary(
         )
 
 
+class TTSRequest(BaseModel):
+    text: str
+    language: Optional[str] = "en"
+
+
 @router.post("/speak")
 async def generate_speech(
-    text: str,
-    language: str = "en",
+    request: TTSRequest,
     current_user: User = Depends(get_current_user)
 ):
     """
@@ -707,6 +712,8 @@ async def generate_speech(
     - language: Language code (en, ha, yo, ig)
     """
     try:
+        text = request.text
+        language = request.language or "en"
         # Validate language
         valid_languages = ["en", "ha", "yo", "ig"]
         if language not in valid_languages:

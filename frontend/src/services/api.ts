@@ -808,8 +808,7 @@ export const voiceApi = {
   },
 
   generateSpeech: async (text: string, language: string): Promise<Blob> => {
-    const response = await api.post('/voice/speak', null, {
-      params: { text, language },
+    const response = await api.post('/voice/speak', { text, language }, {
       responseType: 'blob'
     });
     return response.data;
