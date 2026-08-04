@@ -14,6 +14,10 @@ def _resolve_database_url() -> str:
     if not database_url or database_url.startswith("sqlite"):
         return "sqlite:///./mamacare-ai.db"
 
+    # Support postgres:// URLs from Render/Heroku
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+
     parsed = urlparse(database_url)
     host = (parsed.hostname or "").lower()
 

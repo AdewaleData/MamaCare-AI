@@ -33,7 +33,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section with Background Image */}
-      <section className="relative overflow-hidden min-h-screen flex items-center pt-20 sm:pt-24 lg:pt-28">
+      <section className="relative overflow-hidden min-h-screen flex items-start pt-28 sm:items-center sm:pt-24 lg:pt-28">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
