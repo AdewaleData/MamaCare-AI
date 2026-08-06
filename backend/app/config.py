@@ -91,7 +91,7 @@ class Settings(BaseSettings):
         enable_decoding=False,
     )
 
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./mamacare-ai.db")
+    DATABASE_URL: str = "sqlite:///./mamacare-ai.db"
 
     SECRET_KEY: str = os.getenv("SECRET_KEY", DEFAULT_SECRET_KEY)
     ALGORITHM: str = "HS256"

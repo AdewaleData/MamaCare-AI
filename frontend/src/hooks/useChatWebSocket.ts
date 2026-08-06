@@ -18,8 +18,8 @@ export function useChatWebSocket(token: string | null, onMessage?: (message: Web
 
     // Determine WebSocket URL for chat
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-    const wsUrl = apiBaseUrl.replace(/^https?:\/\//, `${wsProtocol}//`).replace(/\/$/, '') + `/ws/chat/${token}`;
+    const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001';
+    const wsUrl = configuredApiBaseUrl.replace(/^https?:\/\//, `${wsProtocol}//`).replace(/\/$/, '') + `/ws/chat/${token}`;
 
     const connect = () => {
       try {

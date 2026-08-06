@@ -63,8 +63,8 @@ pip install -r requirements.txt
 python run_server.py
 ```
 
-By default the API runs on something like `http://localhost:8000` (see `run_server.py`).  
-Open `http://localhost:8000/docs` to explore the auto-generated Swagger API docs.
+By default the API runs on something like `http://localhost:8001` (see `run_server.py`).  
+Open `http://localhost:8001/docs` to explore the auto-generated Swagger API docs.
 
 ### 4. Frontend Setup (React + Vite)
 ```bash

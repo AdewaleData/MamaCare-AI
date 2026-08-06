@@ -5,6 +5,8 @@ import { authApi } from '../../services/api';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import type { User } from '../../types';
+import { useServerWarmup } from '../../hooks/useServerWarmup';
+import ServerWarmupBanner from '../../components/ServerWarmupBanner';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -12,6 +14,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+  const { status: warmupStatus, elapsed } = useServerWarmup();
+  const serverBusy = warmupStatus === 'connecting' || warmupStatus === 'slow';
 
   const loginMutation = useMutation({
     mutationFn: authApi.login,
@@ -123,6 +127,7 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <div className="glass-card card rounded-3xl shadow-2xl border-2 border-white/30 backdrop-blur-xl hover:shadow-3xl transition-all duration-300">
+          <ServerWarmupBanner status={warmupStatus} elapsed={elapsed} />
           {errors.general && (
             <div className="mb-4 p-3 bg-danger-50 border border-danger-200 rounded-lg text-danger-700 text-sm" role="alert">
               {errors.general}
@@ -188,13 +193,18 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loginMutation.isPending}
-              className="w-full btn-primary py-4 text-base font-bold flex items-center justify-center shadow-lg hover:shadow-xl"
+              disabled={loginMutation.isPending || serverBusy}
+              className="w-full btn-primary py-4 text-base font-bold flex items-center justify-center shadow-lg hover:shadow-xl disabled:opacity-60"
             >
               {loginMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Signing in...
+                </>
+              ) : serverBusy ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Connecting to server...
                 </>
               ) : (
                 'Sign In'

@@ -18,9 +18,8 @@ export function useWebSocket(token: string | null, onMessage?: (message: WebSock
 
     // Determine WebSocket URL based on current API base URL
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = window.location.hostname;
-    const wsPort = window.location.port || (window.location.protocol === 'https:' ? '443' : '8000');
-    const wsUrl = `${wsProtocol}//${wsHost}:${wsPort}/ws/alerts/${token}`;
+    const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001';
+    const wsUrl = configuredApiBaseUrl.replace(/^http/, wsProtocol).replace(/\/$/, '') + `/ws/alerts/${token}`;
 
     const connect = () => {
       try {

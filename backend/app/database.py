@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def _resolve_database_url() -> str:
-    """Use SQLite as a safe fallback when no usable database is configured."""
+    """Resolve the database connection string from configuration."""
     database_url = (settings.DATABASE_URL or "").strip()
 
     if not database_url or database_url.startswith("sqlite"):
@@ -17,16 +17,6 @@ def _resolve_database_url() -> str:
     # Support postgres:// URLs from Render/Heroku
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
-
-    parsed = urlparse(database_url)
-    host = (parsed.hostname or "").lower()
-
-    if host in {"localhost", "127.0.0.1", "::1"}:
-        logger.warning(
-            "DATABASE_URL points to localhost, but no local database is available. "
-            "Falling back to SQLite for startup."
-        )
-        return "sqlite:///./mamacare-ai.db"
 
     return database_url
 
@@ -49,7 +39,19 @@ def _build_engine(database_url: str):
 
 
 DATABASE_URL = _resolve_database_url()
-engine = _build_engine(DATABASE_URL)
+
+try:
+    engine = _build_engine(DATABASE_URL)
+    if DATABASE_URL.startswith("postgres"):
+        with engine.connect() as conn:
+            logger.info("Successfully connected to PostgreSQL database.")
+except Exception as exc:
+    logger.warning(
+        "PostgreSQL connection failed, falling back to sqlite local database: %s",
+        exc,
+    )
+    DATABASE_URL = "sqlite:///./mamacare-ai.db"
+    engine = _build_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

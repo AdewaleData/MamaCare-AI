@@ -41,8 +41,9 @@ def main() -> int:
     _setup_windows_utf8()
     backend_dir = _setup_paths()
 
-    # Render sets PORT. Locally we default to 8000.
-    port = int(os.environ.get("PORT", "8000"))
+    # Render sets PORT. Locally we default to 8001 because 8000 is often blocked
+    # by an existing local process when developing on Windows.
+    port = int(os.environ.get("PORT", "8001"))
 
     # Render must bind to 0.0.0.0. Locally this also works fine.
     host = os.environ.get("HOST", "0.0.0.0")
